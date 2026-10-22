@@ -1,0 +1,292 @@
+2. Practical 1 — Git and GitHub
+This is a great first practical because you can complete most of it in PowerShell without needing a server.
+A. Create a repository and commit a README
+Open PowerShell and run these commands one by one:
+mkdir devops-practical
+cd devops-practical
+
+git init
+"# My DevOps Practical" > README.md
+
+git status
+git add README.md
+git commit -m "Add README file"
+
+git log --oneline
+
+
+If Git asks for your identity, configure it using your own details:
+git config --global user.name "Your Name"
+git config --global user.email "your-email@example.com"
+
+
+Then retry the commit if it failed.
+
+What each command does
+Command	Purpose
+git init	Initializes a local repository
+git status	Shows file and repository status
+git add README.md	Stages the README
+git commit -m "Add README file"	Saves a snapshot in Git history
+git log --oneline	Shows compact commit history
+
+B. Create and switch to a branch
+git switch -c feature-app
+git branch
+
+
+The active branch is marked with *.
+
+To merge the branch into main:
+git switch main
+git merge feature-app
+
+
+If your repository started on master rather than main, rename the initial branch first:
+git branch -M main
+
+
+C. Push the project to GitHub
+First, create an empty repository on GitHub. Copy its actual HTTPS URL, then run:
+git branch -M main
+git remote add origin YOUR_GITHUB_REPOSITORY_URL
+git push -u origin main
+
+
+Replace the placeholder with your real URL. If origin already exists, use git remote -v to check it rather than adding it again.
+
+Viva question: What is the difference between Git and GitHub?
+
+Answer: Git is a distributed version control system that tracks file changes. GitHub is an online platform for hosting Git repositories and collaborating through features such as pull requests and issues.
+
+3. Practical 2 — Create and run a Hello World web application
+Your question paper allows either Python Flask or Node.js. Practice Question.docx
+ Let's learn the Node.js version first because the application is very small.
+Step 1: Create the project
+mkdir hello-app
+cd hello-app
+npm init -y
+
+
+Create a file named app.js in the folder, and add this code:
+
+const http = require('http');
+
+const server = http.createServer((req, res) => {
+    res.writeHead(200, {
+        'Content-Type': 'text/plain'
+    });
+
+    res.end('Hello World!');
+});
+
+server.listen(3000, () => {
+    console.log('Server running at http://localhost:3000');
+});
+
+
+
+Step 2: Run the application
+node app.js
+
+
+Expected terminal output:
+Server running at http://localhost:3000
+
+
+Open this address in your browser:
+
+http://localhost:3000
+
+The page should display Hello World!.
+Step 3: Explain the code in your viva
+- require('http') imports Node.js's built-in HTTP module.
+- createServer() creates an HTTP server.
+- req represents the incoming request.
+- res represents the response sent back to the browser.
+- writeHead(200) sets the HTTP status to 200, meaning success.
+- res.end() sends the response and ends it.
+- listen(3000) starts the server on port 3000.
+Remember: localhost means your own computer. Port 3000 is where this application listens for incoming connections.
+
+4. Practical 3 — Dockerfile, image and container
+Your Docker lab covers the entire lifecycle, including downloading an image, running containers, port mapping, and managing volumes. Lab 2 _ Docker - Container Management.docx
+ For the exam, practise building your own image.
+Step 1: Create the application files
+Inside a new folder, create index.html:
+<!DOCTYPE html>
+<html>
+<head>
+    <title>DevOps Practical</title>
+</head>
+<body>
+    <h1>Hello from Docker!</h1>
+</body>
+</html>
+
+
+Create a file named exactly Dockerfile with no file extension:
+
+FROM nginx:alpine
+COPY index.html /usr/share/nginx/html/index.html
+EXPOSE 80
+
+
+
+Step 2: Build the Docker image
+Run these commands from the directory containing both files:
+docker --version
+docker build -t mywebapp:1.0 .
+docker images
+
+
+- FROM selects the base image.
+- COPY copies the HTML page into NGINX's website directory.
+- EXPOSE documents the port the service uses.
+- -t mywebapp:1.0 names and tags the image.
+- . means the current directory is the build context.
+Step 3: Run the container
+docker run -d --name mywebserver -p 8080:80 mywebapp:1.0
+docker ps
+
+
+Open http://localhost:8080 in your browser. You should see Hello from Docker!
+Understand port mapping
+Your PC
+8080
+Host port
+Container
+80
+NGINX port
+
+-p 8080:80 means host port 8080 forwards to container port 80.
+
+Step 4: Essential Docker commands
+Command	Purpose
+docker images	List images
+docker ps	List running containers
+docker ps -a	List all containers, including stopped ones
+docker stop mywebserver	Stop a container
+docker start mywebserver	Start an existing stopped container
+docker restart mywebserver	Restart a container
+docker logs mywebserver	View container logs
+docker rm mywebserver	Remove a stopped container
+docker rmi mywebapp:1.0	Remove an image when no remaining container depends on it
+
+If you repeat the docker run command using the same container name, Docker will complain that the name is already in use. Stop and remove the old container first, or use a different name.
+Bonus: Docker volumes
+A volume preserves data independently of a container's lifecycle.
+docker volume create student-data
+docker volume ls
+docker volume inspect student-data
+
+
+For your viva, remember this distinction: image = template, container = instance, volume = persistent storage.
+5. Practical 4 — Jenkins setup and CI pipeline
+You have Jenkins setup notes and a practical specifically about creating a Pipeline job, connecting it to GitHub, and running a Jenkinsfile. Unit_2_Continuous_Integration_with_Jenkins_Notes(1).docx
+ Task for 28July 2026.docx
+
+A. First-time Jenkins setup
+Since you're working with Jenkins on your computer, follow this sequence:
+1. Wait for the Jenkins unlock page to finish loading.
+2. If Jenkins asks for an administrator password, retrieve it from the location matching your installation.
+3. Install the suggested plugins, or the required plugins if instructed by your lab.
+4. Create your administrator account.
+5. Sign in and confirm that the Jenkins dashboard opens.
+If Jenkins is running in a Docker container named jenkins, the password command in your notes is:
+docker exec jenkins cat /var/jenkins_home/secrets/initialAdminPassword
+
+
+If Jenkins was installed directly on Windows, the password file location will be different.
+
+Once Jenkins is running, open http://localhost:8080.
+B. Create a Pipeline job
+1. Open the Jenkins dashboard.
+2. Click New Item.
+3. Enter a name such as StudentPipeline.
+4. Select Pipeline, then click OK.
+5. Scroll to the Pipeline section.
+6. Select Pipeline script for a quick local demonstration.
+7. Paste the following script and save it.
+
+pipeline {
+    agent any
+
+    stages {
+        stage('Clone Code') {
+            steps {
+                echo 'Cloning source code'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                echo 'Building application'
+            }
+        }
+
+        stage('Test') {
+            steps {
+                echo 'Testing application'
+            }
+        }
+    }
+
+    post {
+        always {
+            echo 'Pipeline execution finished'
+        }
+    }
+}
+
+
+
+This first script demonstrates Pipeline stages without requiring a GitHub repository or Docker integration.
+C. Execute the pipeline
+Click Build Now, then open the build number and select Console Output.
+
+You should see the three stages execute, followed by the completion message. The build should finish successfully if the Jenkins agent is available and the script is valid.
+D. What the examiner may ask
+- Jenkins: An automation server used to automate builds, tests and deployments.
+- Pipeline: A sequence of automated steps that define a software delivery workflow.
+- Jenkinsfile: A text file that stores a pipeline definition as code.
+- Stage: A named phase, such as Build or Test.
+- Step: An individual action performed within a stage.
+- Plugin: An extension that adds functionality to Jenkins.
+- Freestyle versus Pipeline: Freestyle jobs are mainly configured through the web UI; Pipeline jobs define workflows as code.
+Important: A pipeline that actually builds and runs Docker containers needs Docker CLI access and a working Docker daemon on its build agent. A basic Jenkins container does not automatically have this integration. For a GitHub-connected job, choose Pipeline script from SCM, select Git, enter your repository URL and branch (for example, */main), and set the script path to Jenkinsfile.
+6. Practical 5 — Jira, Kubernetes and Terraform viva
+These topics are included in your remaining unit notes. You should know the basic definitions even if you do not have enough time to practise every command.
+Jira fundamentals
+Viva question	Answer
+What is Jira?	A project and issue-tracking tool used to manage tasks, bugs and project work.
+What is an issue?	A record representing a task, bug, story or other piece of work.
+What is a workflow?	The sequence of statuses through which an issue moves.
+What is a Scrum board?	A board used to organize work into sprints.
+What is a Kanban board?	A board that visualizes work as it moves through stages.
+What is a sprint?	A fixed period during which a Scrum team works toward a goal.
+
+Example workflow: To Do → In Progress → Done.
+Kubernetes fundamentals
+Viva question	Answer
+What is Kubernetes?	A system for orchestrating containerized applications.
+What is a Pod?	The smallest deployable unit in Kubernetes, containing one or more containers.
+What is a Deployment?	A resource that manages application replicas and controlled updates.
+What is a Service?	A resource providing stable network access to selected Pods.
+What is a ConfigMap?	Stores non-sensitive application configuration.
+What is a Secret?	Stores sensitive configuration such as passwords and tokens.
+What is Ingress?	Defines HTTP/HTTPS routing rules for external access to Services.
+
+These definitions follow your Unit 4 notes. Unit_4_Container_Orchestration_with_Kubernetes_Notes(1).docx
+ Unit_4_Container_Orchestration_with_Kubernetes_Notes(1).docx
+
+
+Remember these commands:
+kubectl get pods
+kubectl get deployments
+kubectl get services
+kubectl describe pod POD_NAME
+kubectl scale deployment DEPLOYMENT_NAME --replicas=4
+
+
+The final command scales the Deployment to four replicas.
