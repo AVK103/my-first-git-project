@@ -1,0 +1,313 @@
+Q.1 Initialize a Git repository and commit README.md
+Aim: To create a new Git repository, create a README.md file, and commit it with an appropriate message.
+Step 1: Create a project folder
+Open PowerShell and execute:
+mkdir GitPractical
+cd GitPractical
+
+
+Step 2: Initialize Git
+git init
+
+
+Expected output (the path may differ):
+Initialized empty Git repository
+
+
+Step 3: Create README.md
+"# My First Git Repository" > README.md
+
+
+Add a description:
+"Created for Git practical examination." >> README.md
+
+
+Step 4: Check the repository status
+git status
+
+
+Expected output includes:
+Untracked files:
+    README.md
+
+
+Step 5: Stage the file
+git add README.md
+
+
+Step 6: Commit the file
+git commit -m "Add README file"
+
+
+Expected output resembles:
+[master (root-commit) abc1234] Add README file
+ 1 file changed, 2 insertions(+)
+ create mode 100644 README.md
+
+
+The commit hash and branch name may differ.
+Step 7: Verify the commit
+git log --oneline
+
+
+Expected output:
+abc1234 Add README file
+
+
+Result: A new Git repository was initialized, README.md was created, staged, and committed successfully.
+
+Q.2 Develop a Hello World web application using Node.js
+Aim: To develop a simple Hello World web application using Node.js and execute it locally.
+Step 1: Create the project
+Open PowerShell:
+mkdir HelloWorldApp
+cd HelloWorldApp
+npm init -y
+
+
+This creates a package.json file containing the project's configuration.
+Step 2: Create the application file
+New-Item server.js
+
+
+Open the file in Notepad:
+notepad server.js
+
+
+Paste this code and save the file.
+
+const http = require('http');
+
+const server = http.createServer((req, res) => {
+    res.writeHead(200, {
+        'Content-Type': 'text/html'
+    });
+
+    res.end('<h1>Hello World!</h1><p>My first Node.js web application.</p>');
+});
+
+server.listen(3000, () => {
+    console.log('Server running at http://localhost:3000');
+});
+
+
+
+Step 3: Understand the code
+Code	Explanation
+require('http')	Imports Node.js HTTP module.
+http.createServer()	Creates an HTTP web server.
+req	Contains the incoming request.
+res	Sends a response to the browser.
+writeHead(200, ...)	Sets HTTP status to 200 (OK) and specifies HTML content.
+res.end()	Sends the HTML response and ends it.
+server.listen(3000)	Starts the server on port 3000.
+console.log()	Displays a message in the terminal.
+
+Step 4: Run the application
+In PowerShell, inside the HelloWorldApp folder, execute:
+node server.js
+
+
+Expected terminal output:
+Server running at http://localhost:3000
+
+
+Step 5: Open the browser
+Navigate to:
+http://localhost:3000Expected browser output:
+Hello World!
+My first Node.js web application.
+Result: A Hello World web application was developed and executed successfully using Node.js.
+
+Q.3 Execute the web application on a local machine
+Aim: To execute a web application locally and verify its output in a browser.
+
+You can use the same application developed in Q.2.
+Procedure and commands
+1. Install Node.js and verify the installation.
+2. Create the project folder and initialize npm.
+3. Create server.js with the HTTP server code.
+4. Run the server using node server.js.
+5. Open http://localhost:3000 in a browser.
+6. Verify that the browser displays “Hello World!”.
+Commands to remember
+Run these commands in sequence when creating the project from scratch:
+node --version
+npm --version
+
+mkdir HelloWorldApp
+cd HelloWorldApp
+
+npm init -y
+notepad server.js
+
+
+Paste the code from Q.2 into server.js, save it, then execute:
+node server.js
+
+
+Open http://localhost:3000 in your browser.
+Expected output
+- Terminal: Server running at http://localhost:3000
+- Browser: Hello World!
+- HTTP status: 200 OK
+
+
+
+
+
+
+
+Q.1 Initialize a Git repository and commit README.md
+Aim: To create a new Git repository, create a README.md file, and commit it with an appropriate message.
+Step 1: Create a project folder
+Open PowerShell and execute:
+mkdir GitPractical
+cd GitPractical
+
+
+Step 2: Initialize Git
+git init
+
+
+Expected output (the path may differ):
+Initialized empty Git repository
+
+
+Step 3: Create README.md
+"# My First Git Repository" > README.md
+
+
+Add a description:
+"Created for Git practical examination." >> README.md
+
+
+Step 4: Check the repository status
+git status
+
+
+Expected output includes:
+Untracked files:
+    README.md
+
+
+Step 5: Stage the file
+git add README.md
+
+
+Step 6: Commit the file
+git commit -m "Add README file"
+
+
+Expected output resembles:
+[master (root-commit) abc1234] Add README file
+ 1 file changed, 2 insertions(+)
+ create mode 100644 README.md
+
+
+The commit hash and branch name may differ.
+Step 7: Verify the commit
+git log --oneline
+
+
+Expected output:
+abc1234 Add README file
+
+
+Result: A new Git repository was initialized, README.md was created, staged, and committed successfully.
+
+Q.2 Develop a Hello World web application using Node.js
+Aim: To develop a simple Hello World web application using Node.js and execute it locally.
+Step 1: Create the project
+Open PowerShell:
+mkdir HelloWorldApp
+cd HelloWorldApp
+npm init -y
+
+
+This creates a package.json file containing the project's configuration.
+Step 2: Create the application file
+New-Item server.js
+
+
+Open the file in Notepad:
+notepad server.js
+
+
+Paste this code and save the file.
+
+const http = require('http');
+
+const server = http.createServer((req, res) => {
+    res.writeHead(200, {
+        'Content-Type': 'text/html'
+    });
+
+    res.end('<h1>Hello World!</h1><p>My first Node.js web application.</p>');
+});
+
+server.listen(3000, () => {
+    console.log('Server running at http://localhost:3000');
+});
+
+
+
+Step 3: Understand the code
+Code	Explanation
+require('http')	Imports Node.js HTTP module.
+http.createServer()	Creates an HTTP web server.
+req	Contains the incoming request.
+res	Sends a response to the browser.
+writeHead(200, ...)	Sets HTTP status to 200 (OK) and specifies HTML content.
+res.end()	Sends the HTML response and ends it.
+server.listen(3000)	Starts the server on port 3000.
+console.log()	Displays a message in the terminal.
+
+Step 4: Run the application
+In PowerShell, inside the HelloWorldApp folder, execute:
+node server.js
+
+
+Expected terminal output:
+Server running at http://localhost:3000
+
+
+Step 5: Open the browser
+Navigate to:
+http://localhost:3000Expected browser output:
+Hello World!
+My first Node.js web application.
+Result: A Hello World web application was developed and executed successfully using Node.js.
+
+Q.3 Execute the web application on a local machine
+Aim: To execute a web application locally and verify its output in a browser.
+
+You can use the same application developed in Q.2.
+Procedure and commands
+1. Install Node.js and verify the installation.
+2. Create the project folder and initialize npm.
+3. Create server.js with the HTTP server code.
+4. Run the server using node server.js.
+5. Open http://localhost:3000 in a browser.
+6. Verify that the browser displays “Hello World!”.
+Commands to remember
+Run these commands in sequence when creating the project from scratch:
+node --version
+npm --version
+
+mkdir HelloWorldApp
+cd HelloWorldApp
+
+npm init -y
+notepad server.js
+
+
+Paste the code from Q.2 into server.js, save it, then execute:
+node server.js
+
+
+Open http://localhost:3000 in your browser.
+Expected output
+- Terminal: Server running at http://localhost:3000
+- Browser: Hello World!
+- HTTP status: 200 OK

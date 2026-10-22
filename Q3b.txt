@@ -1,0 +1,187 @@
+Q.1 Create a branch named feature-app and switch to it
+Aim: To create a new Git branch and verify the active branch.
+Step 1: Open your project folder
+If you're continuing from the previous practical:
+cd HelloWorldApp
+
+
+Check that Git is initialized:
+git status
+
+
+If this is a new project and Git has not been initialized, run git init and make an initial commit before proceeding.
+Step 2: Create and switch to the new branch
+git switch -c feature-app
+
+
+This command creates the branch and switches to it in one step.
+
+Alternative commands:
+git branch feature-app
+git switch feature-app
+
+
+Step 3: Verify the active branch
+git branch
+
+
+Expected output:
+* feature-app
+  master
+
+
+Your original branch might be named main instead of master. The * indicates the currently active branch.
+
+You can also run:
+git branch --show-current
+
+
+Expected output:
+feature-app
+
+
+Result: The feature-app branch was created, and the active branch was verified successfully.
+
+Q.2 Create a GitHub repository and push your local project
+Aim: To create a remote repository on GitHub and upload the local project with its commit history.
+Step 1: Create a repository on GitHub
+1. Open GitHub — Create a new repository.
+2. Enter repository name: HelloWorldApp.
+3. Select Public or Private.
+4. Leave Add a README file unchecked if your local repository already has a README.
+5. Click Create repository.
+6. Copy the HTTPS repository URL. It will look like this:
+https://github.com/YOUR-USERNAME/HelloWorldApp.git
+
+
+GitHub recommends creating an empty remote repository when importing an existing local repository. 
+
+GitHub Docs
+
+
+
+Step 2: Connect the local repository to GitHub
+In PowerShell, navigate to your existing project:
+cd HelloWorldApp
+
+
+Add the remote URL, replacing the example with your actual URL:
+git remote add origin https://github.com/YOUR-USERNAME/HelloWorldApp.git
+
+
+Verify the remote:
+git remote -v
+
+
+Expected output:
+origin  https://github.com/YOUR-USERNAME/HelloWorldApp.git (fetch)
+origin  https://github.com/YOUR-USERNAME/HelloWorldApp.git (push)
+
+
+Step 3: Push the project and its commits
+First, verify the branch names:
+git branch
+
+
+To push all local branches and their commits, use:
+git push --all origin
+
+
+To push tags as well, if any exist:
+git push origin --tags
+
+
+If the assignment only requires pushing the current feature-app branch, you can instead use:
+git push -u origin feature-app
+
+
+If GitHub prompts you to authenticate, complete the sign-in in your browser or use an approved Git authentication method.
+Step 4: Verify
+Open your GitHub repository in a browser and check that your files and commit history are present. You can also verify your local commit history using:
+git log --oneline --all
+
+
+Result: The local project was connected to GitHub, and its branches, commits, and optional tags were pushed to the remote repository.
+
+Q.3 Build and run a Docker container for the application
+Aim: To build a Docker image, run a container, map its port to the host machine, and access the application through a browser.
+Step 1: Check Docker installation
+Open PowerShell:
+docker --version
+docker info
+
+
+If Docker is not running, open Docker Desktop and wait until its engine has started.
+Step 2: Create a Dockerfile
+Make sure you are inside the HelloWorldApp folder:
+cd HelloWorldApp
+notepad Dockerfile
+
+
+Paste the following content and save the file. The filename must be exactly Dockerfile, without a .txt extension.
+
+FROM node:22-alpine
+
+WORKDIR /app
+
+COPY package*.json ./
+
+RUN npm install --omit=dev
+
+COPY server.js .
+
+EXPOSE 3000
+
+CMD ["node", "server.js"]
+
+
+
+Explanation
+Instruction	Purpose
+FROM node:22-alpine	Uses a lightweight Node.js base image.
+WORKDIR /app	Sets the working directory inside the image.
+COPY package*.json ./	Copies package configuration files.
+RUN npm install --omit=dev	Installs production dependencies.
+COPY server.js .	Copies the application source code.
+EXPOSE 3000	Documents the port used by the application.
+CMD [...]	Starts the Node.js server when the container runs.
+
+Step 3: Build the Docker image
+Run:
+docker build -t hello-world-app .
+
+
+The -t option assigns the image the name hello-world-app, and . specifies the current directory as the build context.
+
+Verify the image:
+docker images
+
+
+Expected output will include an entry similar to:
+REPOSITORY        TAG       IMAGE ID       CREATED          SIZE
+hello-world-app   latest    abc123def456  A few seconds ago ...
+
+
+The image ID and size will differ on your machine.
+Step 4: Run the container and map the port
+docker run -d --name hello-world-container -p 3000:3000 hello-world-app
+
+
+Understand the command:
+- docker run creates and starts a container.
+- -d runs it in the background.
+- --name assigns a readable container name.
+- -p 3000:3000 maps host port 3000 to container port 3000.
+- hello-world-app is the image being used.
+Verify that the container is running:
+docker ps
+
+
+Expected output includes:
+CONTAINER ID   IMAGE             STATUS         PORTS
+abc123def456   hello-world-app   Up ...         0.0.0.0:3000->3000/tcp
+
+
+Step 5: Access the application in your browser
+Open:
+http://localhost:3000

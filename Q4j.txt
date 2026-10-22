@@ -1,0 +1,224 @@
+Q.1 Create a branch, modify the application, commit, and push to GitHub
+Aim: To create a new Git branch, update the application output, commit the changes, and push the branch to GitHub.
+Step 1: Open your project
+Open PowerShell in your project directory:
+cd HelloWorldApp
+git status
+
+
+Step 2: Create and switch to a new branch
+git switch -c feature-update
+
+
+Verify the active branch:
+git branch --show-current
+
+
+Expected output:
+feature-update
+
+
+Step 3: Modify the application output
+Open your Node.js file:
+notepad server.js
+
+
+Change the existing message in res.end() to the following:
+res.end('<h1>Hello World!</h1><p>Application updated successfully using Git.</p>');
+
+
+Save and close Notepad.
+Step 4: Check the changes
+git status
+git diff
+
+
+You should see that server.js has been modified.
+Step 5: Stage and commit the changes
+git add server.js
+git commit -m "Update application output message"
+
+
+Expected output resembles:
+[feature-update abc1234] Update application output message
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+
+Step 6: Push the branch to GitHub
+If your GitHub remote is already configured:
+git push -u origin feature-update
+
+
+If you have not configured a remote yet, add your actual GitHub repository URL first:
+git remote add origin https://github.com/YOUR-USERNAME/HelloWorldApp.git
+
+
+Then push the branch.
+Step 7: Verify the result
+git branch
+git log -1 --oneline
+
+
+Open your GitHub repository and select the feature-update branch to verify the updated server.js file.
+
+Result: A new branch was created, the application output was modified, and the changes were committed and pushed to GitHub.
+
+Q.2 Create a Dockerfile, build the image, and list available images
+Aim: To create a Dockerfile for a Node.js application, build a Docker image, and display the images available locally.
+Step 1: Create the Dockerfile
+Navigate to the project folder:
+cd HelloWorldApp
+notepad Dockerfile
+
+
+Paste this content and save the file:
+
+FROM node:22-alpine
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm install --omit=dev
+
+COPY server.js .
+
+EXPOSE 3000
+
+CMD ["node", "server.js"]
+
+
+
+Step 2: Build the Docker image
+Ensure Docker Desktop is running, then execute:
+docker build -t hello-world-app .
+
+
+Explanation:
+- docker build builds the image.
+- -t hello-world-app assigns its name.
+- . uses the current directory as the build context.
+Expected output at the end resembles:
+Successfully built abc123def456
+Successfully tagged hello-world-app:latest
+
+
+Newer Docker versions may display a different build summary.
+Step 3: Display the available images
+docker images
+
+
+Expected output resembles:
+REPOSITORY        TAG       IMAGE ID       CREATED          SIZE
+hello-world-app   latest    abc123def456   Seconds ago      ...
+node              22-alpine ...            ...              ...
+
+
+Your image IDs, timestamps, and sizes will differ.
+
+You can also use:
+docker image ls
+
+
+Both commands list local Docker images.
+
+Result: The Dockerfile was created, the image was built successfully, and the available Docker images were displayed.
+
+Q.3 Create a Pipeline project in Jenkins and configure it
+Aim: To create a new Pipeline project in Jenkins, configure the required settings, and execute a basic pipeline.
+Step 1: Open Jenkins
+If Jenkins is already running, open:
+http://localhost:8080Sign in using your Jenkins credentials.
+
+If Jenkins is not running, start it using the method you configured during installation.
+Step 2: Create a new Pipeline project
+
+
+
+
+
+
+
+
+
+1. Click New Item
+
+Enter the project name:
+
+HelloWorld-Pipeline
+
+
+
+
+
+
+
+
+
+
+
+
+2. Select Pipeline
+
+Choose Pipeline from the available project types, then click OK.
+
+
+
+
+
+
+
+
+
+
+
+
+3. Configure the project
+
+Scroll to the Pipeline section and select Pipeline script under Definition.
+
+
+
+Step 3: Enter the Pipeline script
+In the Script field, enter:
+
+pipeline {
+    agent any
+
+    stages {
+        stage('Build') {
+            steps {
+                echo 'Building Hello World Application'
+            }
+        }
+
+        stage('Test') {
+            steps {
+                echo 'Testing Application'
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                echo 'Deployment Successful'
+            }
+        }
+    }
+}
+
+
+
+This is a basic declarative pipeline. It demonstrates three stages without requiring a Git checkout, Docker build, or deployment server.
+Explanation of the script
+Element	Purpose
+pipeline	Defines the pipeline.
+agent any	Allows Jenkins to use any available eligible agent.
+stages	Groups the stages of the pipeline.
+stage('Build')	Defines the build stage.
+steps	Specifies the actions performed in a stage.
+echo	Prints a message in the build log.
+
+Step 4: Save and run the pipeline
+1. Click Save at the bottom of the configuration page.
+2. On the project page, click Build Now.
+3. Under Build History, click the latest build number, such as #1.
+4. Click Console Output to view the result.

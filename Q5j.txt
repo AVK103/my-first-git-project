@@ -1,0 +1,252 @@
+Q.1 Merge feature-app into main and push to GitHub
+Aim: To merge the feature branch into the main branch, verify the merged changes, and push the updated main branch to GitHub.
+Step 1: Open your project
+cd HelloWorldApp
+git status
+git branch
+
+
+Make sure your working tree is clean. If your feature branch contains uncommitted changes, commit them before merging.
+Step 2: Switch to the main branch
+git switch main
+
+
+If your repository uses master instead of main, switch to master and use that branch name consistently.
+Step 3: Update the local main branch
+git pull origin main
+
+
+This retrieves and integrates changes from GitHub. If the remote has not been configured, complete the GitHub remote setup first.
+Step 4: Merge the feature branch
+git merge feature-app
+
+
+Expected output may resemble:
+Updating abc1234..def5678
+Fast-forward
+ server.js | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+
+The output will vary depending on your commits. If Git reports that the branches are already up to date, there may be no new changes to merge.
+Step 5: Verify the merge
+git branch --show-current
+git log --oneline --graph --all
+git status
+
+
+Confirm that:
+- The current branch is main.
+- The feature branch's changes appear in the main branch history.
+- The working tree is clean.
+You can also check the merged application code:
+Get-Content server.js
+
+
+Step 6: Push the updated main branch
+git push origin main
+
+
+Open your GitHub repository, select the main branch, and confirm that the merged code is visible.
+
+Result: The feature-app branch was merged into main, the changes were verified, and the updated branch was pushed to GitHub.
+Note: If your feature branch is named feature-update rather than feature-app, replace feature-app with feature-update in the merge command.
+
+
+Q.2 Configure Jenkins to pull source code from GitHub
+Aim: To configure a Jenkins Pipeline project to retrieve source code from a GitHub repository.
+Step 1: Open Jenkins
+Open Jenkins at localhost:8080 and sign in.
+
+Select your existing Pipeline project, or create a new item named HelloWorld-Git-Pipeline and select Pipeline.
+Step 2: Configure the GitHub repository
+There are two common ways to configure the repository. For this practical, the simplest method is to use a Pipeline script with Git's git step.
+1. Open your Jenkins project.
+2. Click Configure.
+3. Scroll to the Pipeline section.
+4. Under Definition, select Pipeline script.
+5. Enter the following script, replacing the example URL with your actual GitHub repository URL.
+
+pipeline {
+    agent any
+
+    stages {
+        stage('Clone Repository') {
+            steps {
+                git branch: 'main',
+                    url: 'https://github.com/YOUR-USERNAME/HelloWorldApp.git'
+            }
+        }
+
+        stage('Verify Source') {
+            steps {
+                sh 'pwd'
+                sh 'ls -la'
+            }
+        }
+    }
+}
+
+
+
+Important for Windows: If your Jenkins agent runs on Windows, replace the two sh commands with:
+bat 'cd'
+bat 'dir'
+
+
+The Git step checks out the repository into the Jenkins workspace. For a public GitHub repository, credentials are usually unnecessary. For a private repository, configure credentials in Jenkins and reference the appropriate credential ID.
+Step 3: Save and execute
+1. Click Save.
+2. Click Build Now.
+3. Open the latest build number.
+4. Click Console Output.
+Expected results:
+Cloning the remote Git repository
+Checking out Revision ...
+Finished: SUCCESS
+
+
+You should also see the project files listed in the workspace.
+Alternative: Configure Git under Pipeline script from SCM
+Jenkins also supports configuring Git through the job's configuration screen:
+- Definition: Pipeline script from SCM
+- SCM: Git
+- Repository URL: Your GitHub HTTPS URL
+- Credentials: Select credentials if the repository is private
+- Branch Specifier: */main
+- Script Path: Jenkinsfile
+This method is useful when the pipeline script is stored inside your GitHub repository.
+
+Result: Jenkins was configured to pull source code from GitHub and check out the specified branch.
+
+Q.3 Create and execute a Jenkins pipeline to clone, build, and run a Docker container
+Aim: To automate source code checkout, Docker image creation, and container execution through Jenkins, then verify that the web application is running.
+Step 1: Check the project files
+Your GitHub repository should contain at least:
+HelloWorldApp/
+├── server.js
+├── package.json
+├── package-lock.json
+└── Dockerfile
+
+
+The Dockerfile should contain the Node.js image configuration from your previous practical.
+
+Make sure Dockerfile is committed and pushed to the main branch.
+Step 2: Prepare Jenkins and Docker
+Before running the pipeline:
+- Start Docker Desktop and wait until the Docker engine is ready.
+- Confirm the Jenkins machine has Git and the Docker CLI installed.
+- Confirm Jenkins can access the Docker engine.
+- Ensure port 3000 is available on your host machine.
+Test Docker from PowerShell:
+docker --version
+docker info
+
+
+If Jenkins runs as a Windows service, its service account must also have the required Docker access.
+Step 3: Create the Jenkins Pipeline
+Open Jenkins and create a Pipeline item named:
+
+HelloWorld-Docker-Pipeline
+
+Select Pipeline → Pipeline script.
+
+Since your practical environment uses Windows PowerShell, the following pipeline uses Windows bat steps.
+
+Paste this script, replacing the GitHub URL with your actual repository URL.
+
+pipeline {
+    agent any
+
+    stages {
+        stage('Clone Repository') {
+            steps {
+                git branch: 'main',
+                    url: 'https://github.com/YOUR-USERNAME/HelloWorldApp.git'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                bat 'docker build -t hello-world-app .'
+            }
+        }
+
+        stage('Run Docker Container') {
+            steps {
+                bat 'docker rm -f hello-world-container 2>NUL || exit /b 0'
+                bat 'docker run -d --name hello-world-container -p 3000:3000 hello-world-app'
+            }
+        }
+
+        stage('Verify Application') {
+            steps {
+                bat 'docker ps'
+                bat 'docker logs hello-world-container'
+                bat 'curl.exe -f http://localhost:3000'
+            }
+        }
+    }
+}
+
+
+
+What each stage does
+
+1. Clone Repository
+
+Downloads the source code from the main branch of GitHub into the Jenkins workspace.
+
+
+
+
+2. Build Docker Image
+
+Executes docker build using the Dockerfile in the checked-out workspace.
+
+
+
+
+3. Run Docker Container
+
+Removes any old container with the same name, then starts a new container and maps host port 3000 to container port 3000.
+
+
+
+
+4. Verify Application
+
+Lists running containers, displays the logs, and sends an HTTP request to confirm that the application responds.
+
+
+
+Step 4: Save and run the pipeline
+1. Click Save.
+2. Click Build Now.
+3. Open the latest build.
+4. Select Console Output.
+5. Observe each stage as it executes.
+Expected output will resemble:
+[Pipeline] stage (Clone Repository)
+Checking out Revision ...
+
+[Pipeline] stage (Build Docker Image)
+Successfully tagged hello-world-app:latest
+
+[Pipeline] stage (Run Docker Container)
+hello-world-container
+
+[Pipeline] stage (Verify Application)
+CONTAINER ID   IMAGE             STATUS
+...            hello-world-app   Up ...
+
+Hello World!
+
+Finished: SUCCESS
+
+
+The exact logs and image-build messages depend on your Docker and Jenkins versions.
+Step 5: Verify in the browser
+Open this URL on the machine where Docker is running:
+http://localhost:3000
