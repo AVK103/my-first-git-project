@@ -1,0 +1,266 @@
+1. Your practical exam preparation plan
+
+1. Git and GitHub
+
+Create repositories, add files, commit, branch, merge, and push to GitHub.
+Highest priority
+
+
+
+
+2. Create and run a web application
+
+Build a Hello World application using Node.js and Express, then test it in your browser.
+
+
+
+
+3. Docker
+
+Write a Dockerfile, build an image, run a container, and map ports.
+Highest priority
+
+
+
+
+4. Jenkins
+
+Create a Pipeline project, connect a GitHub repository, and understand pipeline stages.
+
+
+
+
+5. Kubernetes and DevOps viva
+
+Revise Pods, Deployments, Services, CI/CD, Terraform, and the purpose of each tool.
+
+
+
+Your practice question paper specifically asks you to attempt two practical questions, with 10 marks each, plus a 5-mark viva and 5 marks for the lab record. It includes Git, a Hello World application, Docker, branching and merging, and Jenkins pipelines. Practice Question.docx
+
+2. Start with the most important practical: Git
+Use VS Code or PowerShell on Windows. Practise these commands in order.
+Practical 1 — Initialize a repository and commit README.md
+Matches Practice Question 1, page 1.
+mkdir DevOps-Practical
+cd DevOps-Practical
+
+git init
+"# DevOps Practical" | Out-File README.md -Encoding utf8
+
+git status
+git add README.md
+git commit -m "Add README file"
+git log --oneline
+
+
+Expected result:
+- git init initializes a repository.
+- git add README.md stages the file.
+- git commit saves the staged changes.
+- git log --oneline displays the commit history.
+If Git asks you to configure your identity, run:
+git config --global user.name "Your Name"
+git config --global user.email "you@example.com"
+
+
+Replace these with your own name and email.
+Practical 2 — Create and switch to a branch
+git switch -c feature-app
+git branch
+
+
+The active branch is marked with *.
+
+Make a change and commit it:
+"Feature added" | Out-File feature.txt -Encoding utf8
+git add .
+git commit -m "Add feature file"
+
+
+Merge the branch into main:
+git switch main
+git merge feature-app
+git log --oneline
+
+
+If your repository's original branch is called master, use master instead of main, or rename it using git branch -M main.
+Practical 3 — Push the project to GitHub
+First create an empty repository on GitHub. Then connect it to your local repository:
+git branch -M main
+git remote add origin https://github.com/USERNAME/REPOSITORY.git
+git push -u origin main
+
+
+Replace the URL with your actual GitHub repository URL.
+
+To push a feature branch:
+git switch feature-app
+git push -u origin feature-app
+
+
+Remember these six commands for the exam:
+Command	Purpose
+git init	Initialize a repository
+git add .	Stage changes
+git commit -m "message"	Save a commit
+git switch -c feature-app	Create and switch branches
+git merge feature-app	Merge a branch into the current branch
+git push	Upload commits to a remote
+
+3. Practical: Create a Hello World web application
+Your practice paper allows either Flask or Node.js. Let's prepare the Node.js option.
+Step 1 — Create the project
+mkdir hello-app
+cd hello-app
+npm init -y
+npm install express
+
+
+Create a file named app.js with this code:
+
+const express = require("express");
+const app = express();
+
+app.get("/", (req, res) => {
+    res.send("Hello World!");
+});
+
+app.listen(3000, () => {
+    console.log("Server running on port 3000");
+});
+
+
+
+Step 2 — Run the application
+node app.js
+
+
+Expected terminal output:
+Server running on port 3000
+
+
+Open http://localhost:3000 in your browser.
+
+Expected browser output:
+localhost:3000
+
+
+Hello World!
+Your application is running successfully.
+
+Viva questions:
+- What is Node.js? A JavaScript runtime that executes JavaScript outside the browser.
+- What is Express? A Node.js web framework used to build web applications and APIs.
+- What does app.get() do? It handles HTTP GET requests for a specified route.
+- What is port 3000? The network port on which this application listens.
+- What is localhost? The local computer, addressed through a loopback network address.
+4. Practical: Dockerfile, image and container
+This is another major topic in your practice paper and Unit 3 notes. Unit_3_Containerization_with_Docker_Notes.docx
+
+
+For a simple static web page, use NGINX.
+Step 1 — Create the files
+campus-site/
+├── Dockerfile
+└── index.html
+
+
+Create index.html:
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Campus Site</title>
+</head>
+<body>
+    <h1>Welcome to Campus Site</h1>
+</body>
+</html>
+
+
+Create Dockerfile (without a file extension):
+FROM nginx:alpine
+COPY index.html /usr/share/nginx/html/index.html
+EXPOSE 80
+
+
+Step 2 — Build and run
+Execute these commands from the campus-site folder:
+docker build -t campus-site .
+docker image ls
+docker run -d --name campus-site-web -p 8080:80 campus-site
+docker ps
+
+
+Open http://localhost:8080.
+
+Expected browser output:
+localhost:8080
+
+
+Welcome to Campus Site
+
+If the container name already exists from an earlier attempt, remove the old container first:
+docker rm -f campus-site-web
+
+
+Understand the commands
+Command or instruction	Purpose
+FROM	Selects the base image
+COPY	Copies the HTML file into the image
+EXPOSE 80	Documents the container's web port
+docker build	Creates the image
+docker image ls	Lists local images
+docker run	Creates and starts a container
+-p 8080:80	Maps host port 8080 to container port 80
+docker ps	Lists running containers
+
+Important viva distinction: An image is the packaged template; a container is a running instance of an image. EXPOSE alone does not publish a port to your host.
+5. Practical: Jenkins Pipeline
+Your Unit 2 notes explain Jenkins jobs, Jenkinsfiles, stages, steps, plugins and build triggers. Your practice paper also includes creating a Pipeline project and connecting GitHub.
+
+A simple Jenkinsfile looks like this:
+
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                echo 'Checking out source code'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                echo 'Building application'
+            }
+        }
+
+        stage('Test') {
+            steps {
+                echo 'Testing application'
+            }
+        }
+    }
+
+    post {
+        always {
+            echo 'Pipeline finished'
+        }
+    }
+}
+
+
+
+To create the job in Jenkins:
+1. Open the Jenkins dashboard.
+2. Select New Item.
+3. Enter a job name and select Pipeline.
+4. Configure the Pipeline definition, or choose Pipeline script from SCM to load a Jenkinsfile from Git.
+5. For SCM, select Git and enter your repository URL and credentials if needed.
+6. Save the job and select Build Now.
+7. Open the build and check Console Output and the stage results.
+This example demonstrates the pipeline structure. It prints messages rather than actually compiling or testing an application.
+
+For the Docker pipeline question, remember the intended flow is Checkout → Build Docker image → Run container → Verify application. A real Jenkins agent needs Docker access and suitable permissions for the Docker stages.
