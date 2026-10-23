@@ -1,763 +1,1176 @@
-Unit 2 — Modules, File System and Events
+Q1. User-defined module to return the sum of digits and display the result in a browser
+Create two files.
 
-Q1. Create a user-defined module to check prime and perfect numbers (runtime input)
+File 1: sum.js
+function sumDigits(n) {
+    n = Math.abs(Number(n));
+    let sum = 0;
 
-Files / setup: Create primePerfect.js and main.js.
-
-// primePerfect.js
-function isPrime(n) {
-  if (n <= 1) return false;
-  for (let i = 2; i <= Math.sqrt(n); i++) {
-    if (n % i === 0) return false;
-  }
-  return true;
-}
- 
-function isPerfect(n) {
-  if (n <= 1) return false;
-  let sum = 0;
-  for (let i = 1; i <= n / 2; i++) {
-    if (n % i === 0) sum += i;
-  }
-  return sum === n;
-}
- 
-module.exports = { isPrime, isPerfect };
- 
-// main.js
-const readline = require('readline');
-const { isPrime, isPerfect } = require('./primePerfect');
-const rl = readline.createInterface({
-  input: process.stdin, output: process.stdout
-});
- 
-rl.question('Enter an integer: ', answer => {
-  const n = Number(answer);
-  if (!Number.isInteger(n)) {
-    console.log('Please enter an integer.');
-  } else {
-    console.log(n + (isPrime(n) ? ' is prime' : ' is not prime'));
-    console.log(n + (isPerfect(n) ? ' is perfect' : ' is not perfect'));
-  }
-  rl.close();
-});
-
-Run: node main.js
-
-Expected result: For input 6: “6 is not prime” and “6 is perfect”.
-
-Exam note: A perfect number equals the sum of its positive proper divisors; 6 = 1 + 2 + 3.
-
-Q2. Custom module to calculate area and circumference of a circle
-
-Files / setup: Create circle.js and main.js.
-
-// circle.js
-function area(r) {
-  return Math.PI * r * r;
-}
-function circumference(r) {
-  return 2 * Math.PI * r;
-}
-module.exports = { area, circumference };
- 
-// main.js
-const readline = require('readline');
-const circle = require('./circle');
-const rl = readline.createInterface({
-  input: process.stdin, output: process.stdout
-});
-rl.question('Enter radius: ', value => {
-  const r = Number(value);
-  if (!Number.isFinite(r) || r < 0) {
-    console.log('Enter a valid non-negative radius.');
-  } else {
-    console.log('Area = ' + circle.area(r).toFixed(2));
-    console.log('Circumference = ' + circle.circumference(r).toFixed(2));
-  }
-  rl.close();
-});
-
-Run: node main.js
-
-Expected result: For radius 7: Area ≈ 153.94; circumference ≈ 43.98.
-
-Q3. Prime and perfect number module
-
-Files / setup: Same as Q1. Use primePerfect.js and main.js from Q1.
-
-// The module exports:
-module.exports = { isPrime, isPerfect };
-// In main.js:
-const { isPrime, isPerfect } = require('./primePerfect');
-
-Run: node main.js
-
-Expected result: Use the complete Q1 code; Q3 is repeated in the question bank.
-
-Exam note: Do not write a second different solution—Q1 and Q3 have identical requirements.
-
-Q4. Custom module to calculate factorial and use it in the main script
-
-Files / setup: Create factorial.js and main.js.
-
-// factorial.js
-function factorial(n) {
-  if (!Number.isInteger(n) || n < 0) {
-    throw new Error('Enter a non-negative integer.');
-  }
-  let result = 1;
-  for (let i = 2; i <= n; i++) result *= i;
-  return result;
-}
-module.exports = factorial;
- 
-// main.js
-const readline = require('readline');
-const factorial = require('./factorial');
-const rl = readline.createInterface({
-  input: process.stdin, output: process.stdout
-});
-rl.question('Enter a non-negative integer: ', value => {
-  try {
-    console.log('Factorial = ' + factorial(Number(value)));
-  } catch (err) {
-    console.log(err.message);
-  }
-  rl.close();
-});
-
-Run: node main.js
-
-Expected result: For input 5: Factorial = 120.
-
-Q5. Prime and perfect number module
-
-Files / setup: Same solution as Q1 (and Q3).
-
-// Reuse primePerfect.js and main.js from Q1.
-const { isPrime, isPerfect } = require('./primePerfect');
-
-Run: node main.js
-
-Expected result: Q5 repeats the same prime/perfect number task.
-
-Q6. Read student.json, parse it into an object and display it in a browser
-
-Files / setup: Create student.json and server.js.
-
-// student.json
-{
-  "rollno": 101,
-  "name": "Asha",
-  "course": "MCA",
-  "fees": 75000
-}
- 
-// server.js
-const http = require('http');
-const fs = require('fs');
-const path = require('path');
- 
-http.createServer((req, res) => {
-  fs.readFile(path.join(__dirname, 'student.json'), 'utf8', (err, data) => {
-    if (err) {
-      res.writeHead(500, { 'Content-Type': 'text/plain' });
-      return res.end('Unable to read student file');
+    while (n > 0) {
+        sum += n % 10;
+        n = Math.floor(n / 10);
     }
-    const student = JSON.parse(data);
-    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-    res.end(`<h2>Student Details</h2>
-      <p>Roll No: ${student.rollno}</p>
-      <p>Name: ${student.name}</p>
-      <p>Course: ${student.course}</p>
-      <p>Fees: ${student.fees}</p>`);
-  });
-}).listen(3000, () => console.log('Open http://localhost:3000'));
 
-Run: node server.js, then open http://localhost:3000
-
-Expected result: The browser displays the student's roll number, name, course and fees.
-
-Exam note: JSON.parse() converts JSON text into a JavaScript object.
-
-Q7. Create, write, append, read and delete a text file
-
-Files / setup: Create fileOps.js.
-
-const fs = require('fs');
- 
-fs.writeFile('sample.txt', 'Hello Node.js\n', err => {
-  if (err) throw err;
-  console.log('File created and written.');
- 
-  fs.appendFile('sample.txt', 'This line is appended.\n', err => {
-    if (err) throw err;
-    console.log('Content appended.');
- 
-    fs.readFile('sample.txt', 'utf8', (err, data) => {
-      if (err) throw err;
-      console.log('File content:\n' + data);
- 
-      fs.unlink('sample.txt', err => {
-        if (err) throw err;
-        console.log('File deleted.');
-      });
-    });
-  });
-});
-
-Run: node fileOps.js
-
-Expected result: Messages confirm writing, appending, reading and deleting.
-
-Q8. Copy source.txt to destination.txt using streams
-
-Files / setup: Create source.txt with sample text and copyStream.js.
-
-const fs = require('fs');
- 
-const source = fs.createReadStream('source.txt');
-const destination = fs.createWriteStream('destination.txt');
- 
-source.on('error', err => console.error('Read error:', err.message));
-destination.on('error', err => console.error('Write error:', err.message));
-destination.on('finish', () => console.log('File copied successfully.'));
-source.pipe(destination);
-
-Run: node copyStream.js
-
-Expected result: destination.txt contains the contents of source.txt.
-
-Exam note: Streams copy data in chunks instead of loading the entire file into memory.
-
-Q9. Check whether a path is a file or directory; list directory contents
-
-Files / setup: Create checkPath.js. Pass the path as a command-line argument.
-
-const fs = require('fs');
-const path = require('path');
- 
-const target = process.argv[2];
-if (!target) {
-  console.log('Usage: node checkPath.js <path>');
-  process.exit(1);
+    return sum;
 }
-const fullPath = path.resolve(target);
- 
-fs.stat(fullPath, (err, stats) => {
-  if (err) return console.log('Path not found.');
-  if (stats.isFile()) {
-    console.log('It is a file.');
-  } else if (stats.isDirectory()) {
-    console.log('It is a directory. Contents:');
-    fs.readdir(fullPath, (err, items) => {
-      if (err) return console.error(err.message);
-      items.forEach(item => console.log(item));
+
+module.exports = sumDigits;
+
+
+File 2: app.js
+const http = require('http');
+const sumDigits = require('./sum');
+
+http.createServer((req, res) => {
+    const url = new URL(req.url, 'http://localhost:3000');
+    const n = Number(url.searchParams.get('n') || 1234);
+
+    res.writeHead(200, {
+        'Content-Type': 'text/html; charset=utf-8'
     });
-  } else {
-    console.log('It is neither a regular file nor a directory.');
-  }
+
+    res.end(`<h2>Sum of digits of ${n} = ${sumDigits(n)}</h2>`);
+}).listen(3000, () => {
+    console.log('http://localhost:3000/?n=1234');
 });
 
-Run: node checkPath.js .  (or node checkPath.js sample.txt)
 
-Expected result: For a directory, its file and subdirectory names are printed.
+Run:
+node app.js
 
-Q10. Add a new student record to students.json using fs
 
-Files / setup: Create students.json containing [] and addStudent.js.
+Open http://localhost:3000/?n=1234.
 
+Output: Sum of digits of 1234 = 10
+Q2. Create a Node.js application that displays your profile
+Create profile.js.
+const http = require('http');
+
+const profile = {
+    name: 'Avinash Karale',
+    course: 'MCA',
+    college: 'Sri Balaji University, Pune',
+    skills: 'Node.js, JavaScript, MongoDB, MySQL',
+    hobby: 'Chess and coding'
+};
+
+http.createServer((req, res) => {
+    res.writeHead(200, {
+        'Content-Type': 'text/html; charset=utf-8'
+    });
+
+    res.end(`
+        <h1>My Profile</h1>
+        <p><b>Name:</b> ${profile.name}</p>
+        <p><b>Course:</b> ${profile.course}</p>
+        <p><b>College:</b> ${profile.college}</p>
+        <p><b>Skills:</b> ${profile.skills}</p>
+        <p><b>Hobbies:</b> ${profile.hobby}</p>
+    `);
+}).listen(3000, () => {
+    console.log('Open http://localhost:3000');
+});
+
+
+Run: node profile.js
+
+Output: Your profile is displayed as an HTML page. Change the profile fields if required.
+Q3. List all files in a directory using Node.js
+Create listFiles.js.
 const fs = require('fs');
-const readline = require('readline');
-const rl = readline.createInterface({
-  input: process.stdin, output: process.stdout
-});
- 
-rl.question('Roll number: ', roll => {
-  rl.question('Name: ', name => {
-    rl.question('Course: ', course => {
-      const file = 'students.json';
-      fs.readFile(file, 'utf8', (err, data) => {
-        if (err && err.code !== 'ENOENT') throw err;
-        let students = [];
-        if (!err && data.trim()) students = JSON.parse(data);
-        students.push({ rollno: Number(roll), name, course });
-        fs.writeFile(file, JSON.stringify(students, null, 2), err => {
-          if (err) throw err;
-          console.log('Student added.');
-          rl.close();
-        });
-      });
+
+const directory = '.';
+
+fs.readdir(directory, (err, files) => {
+    if (err) {
+        console.log(err.message);
+        return;
+    }
+
+    console.log('Files and folders:');
+
+    files.forEach(file => {
+        console.log(file);
     });
-  });
 });
 
-Run: node addStudent.js
 
-Expected result: The new student object is saved in students.json.
+Run:
+node listFiles.js
 
-Exam note: Start with [] in students.json. In real applications, validate input and handle malformed JSON.
 
-Events
+Output: The names of files and folders in the current directory.
+Q4. Create MySQL database college_db and insert at least three student records
+First, execute this SQL in MySQL:
+CREATE DATABASE college_db;
+USE college_db;
 
-Q11. Handle user login and logout events
+CREATE TABLE students (
+    id INT PRIMARY KEY,
+    name VARCHAR(100),
+    course VARCHAR(50),
+    marks INT
+);
 
-Files / setup: Create authEvents.js.
 
+Install the MySQL package:
+npm install mysql2
+
+
+Create insertStudents.js.
+const mysql = require('mysql2');
+
+const db = mysql.createConnection({
+    host: 'localhost',
+    user: 'root',
+    password: 'YOUR_PASSWORD',
+    database: 'college_db'
+});
+
+db.connect(err => {
+    if (err) throw err;
+
+    const sql = `
+        INSERT INTO students (id, name, course, marks)
+        VALUES ?
+    `;
+
+    const students = [
+        [1, 'Asha', 'MCA', 85],
+        [2, 'Rahul', 'BCA', 78],
+        [3, 'Priya', 'MCA', 92]
+    ];
+
+    db.query(sql, [students], (err, result) => {
+        if (err) throw err;
+
+        console.log('Records inserted:', result.affectedRows);
+        db.end();
+    });
+});
+
+
+Run: node insertStudents.js
+
+Output: Records inserted: 3
+
+Replace YOUR_PASSWORD with your MySQL password. Run the insert program only once unless you change the IDs or clear the table.
+Q5. Use the event module to read and write files using two different events
+Create fileEvents.js.
 const EventEmitter = require('events');
-const auth = new EventEmitter();
- 
-auth.on('login', username => console.log(username + ' logged in.'));
-auth.on('logout', username => console.log(username + ' logged out.'));
- 
-auth.emit('login', 'Asha');
-auth.emit('logout', 'Asha');
+const fs = require('fs');
+
+const event = new EventEmitter();
+
+// Write event
+event.on('write', () => {
+    fs.writeFile('sample.txt', 'Hello Node.js', err => {
+        if (err) throw err;
+
+        console.log('File written successfully');
+        event.emit('read');
+    });
+});
+
+// Read event
+event.on('read', () => {
+    fs.readFile('sample.txt', 'utf8', (err, data) => {
+        if (err) throw err;
+
+        console.log('File content:', data);
+    });
+});
+
+event.emit('write');
+
+
+Run: node fileEvents.js
+
+Output:
+File written successfully
+File content: Hello Node.js
+
+
+The write event creates the file, and after writing completes it triggers the read event.
+Q6. Validate username and password using MySQL
+Create the database and table:
+CREATE DATABASE login_db;
+USE login_db;
+
+CREATE TABLE users (
+    username VARCHAR(50) PRIMARY KEY,
+    password VARCHAR(255) NOT NULL
+);
+
+INSERT INTO users VALUES ('admin', '12345');
+
+
+Install the required packages:
+npm install express mysql2
+
+
+Create login.js.
+const express = require('express');
+const mysql = require('mysql2');
+
+const app = express();
+
+app.use(express.urlencoded({ extended: true }));
+
+const db = mysql.createConnection({
+    host: 'localhost',
+    user: 'root',
+    password: 'YOUR_PASSWORD',
+    database: 'login_db'
+});
+
+app.get('/', (req, res) => {
+    res.send(`
+        <h2>Login Form</h2>
+        <form method="POST" action="/login">
+            Username: <input name="username" required><br>
+            Password: <input name="password"
+                             type="password" required><br>
+            <button type="submit">Login</button>
+        </form>
+    `);
+});
+
+app.post('/login', (req, res) => {
+    const { username, password } = req.body;
+
+    db.execute(
+        'SELECT * FROM users WHERE username = ? AND password = ?',
+        [username, password],
+        (err, rows) => {
+            if (err) return res.status(500).send('Database error');
+
+            if (rows.length > 0) {
+                res.send('Login successful');
+            } else {
+                res.send('Invalid username or password');
+            }
+        }
+    );
+});
+
+app.listen(3000, () => {
+    console.log('http://localhost:3000');
+});
+
+
+Run: node login.js
+
+Use username admin and password 12345 to test this classroom example.
+
+Security note: This demonstrates the requested SQL validation. Real applications must store password hashes, for example with bcrypt, instead of plaintext passwords.
+Q7. Handle user login and logout activities using events
+Create authEvents.js.
+const EventEmitter = require('events');
+const event = new EventEmitter();
+
+event.on('login', username => {
+    console.log(username + ' logged in');
+});
+
+event.on('logout', username => {
+    console.log(username + ' logged out');
+});
+
+event.emit('login', 'Rahul');
+event.emit('logout', 'Rahul');
+
 
 Run: node authEvents.js
 
-Expected result: Asha logged in. / Asha logged out.
+Output:
+Rahul logged in
+Rahul logged out
 
-Q12. Emit orderPlaced with order ID and amount
 
-Files / setup: Create order.js.
+Q8. Sort, find maximum and reverse a number array using Lodash
+Install Lodash:
+npm install lodash
 
+
+Create arrayLodash.js.
+const _ = require('lodash');
+
+const numbers = [45, 12, 89, 23, 67];
+
+console.log('Original:', numbers);
+console.log('Sorted:', _.sortBy(numbers));
+console.log('Maximum:', _.max(numbers));
+console.log('Reversed:', _.reverse([...numbers]));
+
+
+Run: node arrayLodash.js
+
+Output:
+Original: [ 45, 12, 89, 23, 67 ]
+Sorted: [ 12, 23, 45, 67, 89 ]
+Maximum: 89
+Reversed: [ 67, 23, 89, 12, 45 ]
+
+
+The spread syntax copies the array before reversing so that the original array stays unchanged.
+Q9. Student objects using Lodash: sort names, search by roll number and display BCA students
+Create studentsLodash.js.
+const _ = require('lodash');
+
+const students = [
+    { rollno: 103, name: 'Rahul', course: 'BCA' },
+    { rollno: 101, name: 'Asha', course: 'MCA' },
+    { rollno: 104, name: 'Priya', course: 'BCA' },
+    { rollno: 102, name: 'Amit', course: 'MCA' }
+];
+
+// Sort students by name
+console.log('Sorted by name:');
+console.log(_.sortBy(students, ['name']));
+
+// Search student by roll number
+const student = _.find(students, { rollno: 103 });
+console.log('Searched student:', student);
+
+// Display only BCA students
+const bcaStudents = _.filter(students, { course: 'BCA' });
+console.log('BCA students:', bcaStudents);
+
+
+Run: node studentsLodash.js
+
+Output: The program displays the students alphabetically, the record with roll number 103, and all students studying BCA.
+Q10. Event-driven application listening to multiple events and triggering callbacks
+Create multipleEvents.js.
 const EventEmitter = require('events');
-const shop = new EventEmitter();
- 
-shop.on('orderPlaced', (orderId, amount) => {
-  console.log('Order ID: ' + orderId);
-  console.log('Amount: ₹' + amount);
+const event = new EventEmitter();
+
+event.on('start', () => {
+    console.log('Application started');
 });
- 
-shop.emit('orderPlaced', 'ORD101', 1499);
 
-Run: node order.js
-
-Expected result: Order ID: ORD101; Amount: ₹1499.
-
-Q13. Multiple listeners for annual cultural programs and remove listeners
-
-Files / setup: Create cultural.js.
-
-const EventEmitter = require('events');
-const college = new EventEmitter();
- 
-function music() { console.log('Music competition'); }
-function dance() { console.log('Dance competition'); }
-function drama() { console.log('Drama competition'); }
- 
-college.on('annualDay', music);
-college.on('annualDay', dance);
-college.on('annualDay', drama);
- 
-console.log('All programs:');
-college.emit('annualDay');
- 
-college.removeListener('annualDay', dance);
-console.log('After removing dance listener:');
-college.emit('annualDay');
-
-Run: node cultural.js
-
-Expected result: First emission prints music, dance and drama. Second prints music and drama.
-
-Unit 3 — Web Applications, Express and Uploads
-
-Q14. Express routing for Home, About and Contact Us
-
-Files / setup: Install Express: npm install express. Create app.js.
-
-const express = require('express');
-const app = express();
- 
-app.get('/', (req, res) => res.send('<h1>Home Page</h1>'));
-app.get('/about', (req, res) => res.send('<h1>About Us</h1>'));
-app.get('/contact', (req, res) => res.send('<h1>Contact Us</h1>'));
- 
-app.listen(3000, () => console.log('http://localhost:3000'));
-
-Run: node app.js; visit /, /about and /contact on localhost:3000
-
-Expected result: Each URL displays its matching page.
-
-Q15. Accept Student details using POST and display after submit
-
-Files / setup: Install Express: npm install express. Create app.js; this serves the form and handles POST.
-
-const express = require('express');
-const app = express();
-app.use(express.urlencoded({ extended: true }));
- 
-app.get('/', (req, res) => res.send(`
-  <h2>Student Form</h2>
-  <form method="POST" action="/student">
-    Roll No: <input name="rollno" required><br>
-    Name: <input name="name" required><br>
-    Course: <input name="course" required><br>
-    Fees: <input name="fees" type="number" required><br>
-    <button type="submit">Submit</button>
-  </form>`));
- 
-app.post('/student', (req, res) => {
-  const { rollno, name, course, fees } = req.body;
-  res.send(`<h2>Student Details</h2>
-    Roll No: ${rollno}<br>Name: ${name}<br>
-    Course: ${course}<br>Fees: ${fees}`);
+event.on('save', () => {
+    console.log('Data saved');
 });
-app.listen(3000, () => console.log('http://localhost:3000'));
 
-Run: node app.js; open http://localhost:3000
-
-Expected result: Enter the student details and submit; the details are displayed.
-
-Exam note: express.urlencoded() parses HTML form data sent using POST.
-
-Q16. Increase an employee's salary by 10% for a given employee ID and display records
-
-Files / setup: Install MySQL driver: npm install mysql2. Assumes database companydb and table Employee(eid, ename, salary). Update credentials.
-
-const mysql = require('mysql2');
- 
-const db = mysql.createConnection({
-  host: 'localhost', user: 'root',
-  password: 'YOUR_PASSWORD', database: 'companydb'
+event.on('stop', () => {
+    console.log('Application stopped');
 });
- 
-db.connect(err => {
-  if (err) throw err;
-  const empId = Number(process.argv[2]);
-  if (!Number.isInteger(empId)) {
-    console.log('Run: node salary.js <employeeId>');
-    return db.end();
-  }
- 
-  db.execute('UPDATE Employee SET salary = salary * 1.10 WHERE eid = ?',
-    [empId], (err, result) => {
-      if (err) throw err;
-      console.log('Rows updated:', result.affectedRows);
-      db.query('SELECT * FROM Employee', (err, rows) => {
-        if (err) throw err;
-        console.table(rows);
-        db.end();
-      });
+
+event.emit('start');
+event.emit('save');
+event.emit('stop');
+
+
+Run: node multipleEvents.js
+
+Output:
+Application started
+Data saved
+Application stopped
+
+
+The registered callback for each event executes when that event is emitted.
+
+Q11. Check whether a given name is a file or directory; display directory contents in a browser
+Create checkPathServer.js.
+const http = require('http');
+const fs = require('fs');
+const path = require('path');
+
+http.createServer((req, res) => {
+    const url = new URL(req.url, 'http://localhost:3000');
+    const name = url.searchParams.get('name') || '.';
+    const target = path.resolve(__dirname, name);
+
+    // Keep the requested path inside this project directory
+    if (target !== __dirname &&
+        !target.startsWith(__dirname + path.sep)) {
+        res.writeHead(400);
+        return res.end('Invalid path');
+    }
+
+    fs.stat(target, (err, stats) => {
+        res.writeHead(200, {
+            'Content-Type': 'text/html; charset=utf-8'
+        });
+
+        if (err) {
+            return res.end('<h2>File or directory not found</h2>');
+        }
+
+        if (stats.isFile()) {
+            return res.end('<h2>It is a file</h2>');
+        }
+
+        if (stats.isDirectory()) {
+            fs.readdir(target, (err, files) => {
+                if (err) return res.end('Unable to read directory');
+
+                res.end(`
+                    <h2>Directory Contents</h2>
+                    <ul>
+                        ${files.map(f => `<li>${f}</li>`).join('')}
+                    </ul>
+                `);
+            });
+        } else {
+            res.end('Unknown type');
+        }
     });
+}).listen(3000, () => {
+    console.log('http://localhost:3000');
 });
 
-Run: node salary.js 101
 
-Expected result: The matching employee's salary increases by 10%, then all employee records are printed.
+Run:
+node checkPathServer.js
 
-Exam note: Change database credentials and column names to match your actual table. Parameterized queries avoid SQL injection.
 
-Q17. Upload an image file using Node.js
+Open http://localhost:3000/?name=. to list the current project directory.
+Q12. Accept name and age and check voting eligibility using query parameters
+Create voting.js.
+const http = require('http');
 
-Files / setup: Install: npm install express multer. Create app.js.
+http.createServer((req, res) => {
+    const url = new URL(req.url, 'http://localhost:3000');
 
+    const name = url.searchParams.get('name');
+    const age = Number(url.searchParams.get('age'));
+
+    res.writeHead(200, {
+        'Content-Type': 'text/html; charset=utf-8'
+    });
+
+    if (!name || url.searchParams.get('age') === null ||
+        !Number.isFinite(age) || age < 0) {
+        return res.end(
+            'Enter valid parameters: ?name=Rahul&age=20'
+        );
+    }
+
+    if (age >= 18) {
+        res.end(`<h2>${name} is eligible for voting</h2>`);
+    } else {
+        res.end(`<h2>${name} is not eligible for voting</h2>`);
+    }
+}).listen(3000, () => {
+    console.log('http://localhost:3000/?name=Rahul&age=20');
+});
+
+
+Run: node voting.js
+
+Open:
+
+http://localhost:3000/?name=Rahul&age=20
+
+Output: Rahul is eligible for voting
+Q13. Demonstrate routing using Express: Home, About and Contact Us
+Install Express:
+npm install express
+
+
+Create routes.js.
+const express = require('express');
+const app = express();
+
+app.get('/', (req, res) => {
+    res.send('<h1>Home Page</h1>');
+});
+
+app.get('/about', (req, res) => {
+    res.send('<h1>About Us</h1>');
+});
+
+app.get('/contact', (req, res) => {
+    res.send('<h1>Contact Us</h1>');
+});
+
+app.listen(3000, () => {
+    console.log('Server running on port 3000');
+});
+
+
+Run: node routes.js
+
+Visit /, /about, and /contact on http://localhost:3000.
+Q14. Copy the contents of one file to another
+Create source.txt and add some text.
+
+Create copyFile.js.
+const fs = require('fs');
+
+fs.copyFile('source.txt', 'destination.txt', err => {
+    if (err) {
+        console.log('Error:', err.message);
+        return;
+    }
+
+    console.log('File copied successfully');
+});
+
+
+Run: node copyFile.js
+
+Output: File copied successfully
+
+The contents of source.txt are copied into destination.txt.
+Q15. Read student.json, parse it into a JavaScript object and display it in the browser
+Create student.json.
+{
+    "rollno": 101,
+    "name": "Asha",
+    "course": "MCA",
+    "marks": 85
+}
+
+
+Create studentServer.js.
+const http = require('http');
+const fs = require('fs');
+const path = require('path');
+
+http.createServer((req, res) => {
+    fs.readFile(
+        path.join(__dirname, 'student.json'),
+        'utf8',
+        (err, data) => {
+            if (err) {
+                res.writeHead(500);
+                return res.end('Unable to read student.json');
+            }
+
+            const student = JSON.parse(data);
+
+            res.writeHead(200, {
+                'Content-Type': 'text/html; charset=utf-8'
+            });
+
+            res.end(`
+                <h2>Student Details</h2>
+                <p>Roll No: ${student.rollno}</p>
+                <p>Name: ${student.name}</p>
+                <p>Course: ${student.course}</p>
+                <p>Marks: ${student.marks}</p>
+            `);
+        }
+    );
+}).listen(3000, () => {
+    console.log('http://localhost:3000');
+});
+
+
+Run: node studentServer.js
+
+The browser displays the student details.
+Q16. Create a Node.js application for validating a student registration form
+Install Express:
+npm install express
+
+
+Create registration.js.
+const express = require('express');
+const app = express();
+
+app.use(express.urlencoded({ extended: true }));
+
+app.get('/', (req, res) => {
+    res.send(`
+        <h2>Student Registration</h2>
+
+        <form method="POST" action="/register">
+            Name:
+            <input name="name" required><br>
+
+            Email:
+            <input type="email" name="email" required><br>
+
+            Age:
+            <input type="number" name="age"
+                   min="1" max="100" required><br>
+
+            Course:
+            <select name="course" required>
+                <option value="">Select Course</option>
+                <option value="BCA">BCA</option>
+                <option value="MCA">MCA</option>
+                <option value="MBA">MBA</option>
+            </select><br>
+
+            <button type="submit">Register</button>
+        </form>
+    `);
+});
+
+app.post('/register', (req, res) => {
+    const { name, email, age, course } = req.body;
+
+    if (!name || !email || !age || !course) {
+        return res.status(400).send('All fields are required');
+    }
+
+    if (Number(age) < 1 || Number(age) > 100) {
+        return res.status(400).send('Invalid age');
+    }
+
+    res.send(`
+        <h2>Registration Successful</h2>
+        Name: ${name}<br>
+        Email: ${email}<br>
+        Age: ${age}<br>
+        Course: ${course}
+    `);
+});
+
+app.listen(3000, () => {
+    console.log('http://localhost:3000');
+});
+
+
+Run: node registration.js
+
+Fill out the form and click Register. The program validates the fields and displays the submitted details.
+Q17. Create a Node.js application for validating a student registration form
+Q17 repeats Q16 in the uploaded question bank. Use the same registration.js code and run:
+node registration.js
+
+
+Q18. Upload a text file using Node.js
+Install the packages:
+npm install express multer
+
+
+Create textUpload.js.
 const express = require('express');
 const multer = require('multer');
-const path = require('path');
 const fs = require('fs');
- 
+
 fs.mkdirSync('uploads', { recursive: true });
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, 'uploads/'),
-  filename: (req, file, cb) =>
-    cb(null, Date.now() + path.extname(file.originalname))
-});
+
 const upload = multer({
-  storage,
-  fileFilter: (req, file, cb) => {
-    const allowed = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-    cb(null, allowed.includes(file.mimetype));
-  }
+    dest: 'uploads/',
+    limits: { fileSize: 2 * 1024 * 1024 },
+    fileFilter: (req, file, cb) => {
+        cb(null, file.originalname.toLowerCase().endsWith('.txt'));
+    }
 });
+
 const app = express();
- 
-app.get('/', (req, res) => res.send(`
-  <form method="POST" action="/upload" enctype="multipart/form-data">
-    <input type="file" name="image" accept="image/*" required>
-    <button>Upload image</button>
-  </form>`));
- 
-app.post('/upload', upload.single('image'), (req, res) => {
-  if (!req.file) return res.status(400).send('Please select a supported image.');
-  res.send('Image uploaded: ' + req.file.filename);
+
+app.get('/', (req, res) => {
+    res.send(`
+        <h2>Upload Text File</h2>
+        <form method="POST" action="/upload"
+              enctype="multipart/form-data">
+            <input type="file" name="document"
+                   accept=".txt" required>
+            <button type="submit">Upload</button>
+        </form>
+    `);
 });
-app.listen(3000, () => console.log('http://localhost:3000'));
 
-Run: node app.js; open http://localhost:3000
+app.post('/upload', upload.single('document'), (req, res) => {
+    if (!req.file) {
+        return res.status(400).send('Please select a .txt file');
+    }
 
-Expected result: Uploaded images are saved in the uploads folder.
+    res.send('Text file uploaded successfully');
+});
 
-Exam note: For production, also validate file contents and size; MIME type alone is not a security guarantee.
+app.listen(3000, () => {
+    console.log('http://localhost:3000');
+});
 
-Q18. Accept Employee details using POST and display after submit
 
-Files / setup: Install Express: npm install express. Create employee.js.
+Run: node textUpload.js
 
+Select a .txt file and submit. It is stored in the uploads directory. This classroom example checks the filename extension; production systems should also validate the actual file contents.
+
+Q19. Create an event to greet users according to the current time
+Create greeting.js.
+const EventEmitter = require('events');
+const event = new EventEmitter();
+
+event.on('greet', name => {
+    const hour = new Date().getHours();
+    let message;
+
+    if (hour < 12) {
+        message = 'Good Morning';
+    } else if (hour < 17) {
+        message = 'Good Afternoon';
+    } else {
+        message = 'Good Evening';
+    }
+
+    console.log(message + ', ' + name);
+});
+
+event.emit('greet', 'Avinash');
+
+
+Run:
+node greeting.js
+
+
+The program displays Good Morning, Good Afternoon, or Good Evening according to the system's current local time.
+Q20. Accept employee details and display them on Submit using POST
+Install Express:
+npm install express
+
+
+Create employee.js.
 const express = require('express');
 const app = express();
+
 app.use(express.urlencoded({ extended: true }));
- 
-app.get('/', (req, res) => res.send(`
-  <h2>Employee Form</h2>
-  <form method="POST" action="/employee">
-    Employee ID: <input name="eid" required><br>
-    Name: <input name="ename" required><br>
-    Designation: <input name="designation" required><br>
-    Company: <input name="company" required><br>
-    <button type="submit">Submit</button>
-  </form>`));
- 
-app.post('/employee', (req, res) => {
-  const { eid, ename, designation, company } = req.body;
-  res.send(`<h2>Employee Details</h2>
-    ID: ${eid}<br>Name: ${ename}<br>
-    Designation: ${designation}<br>Company: ${company}`);
+
+app.get('/', (req, res) => {
+    res.send(`
+        <h2>Employee Details</h2>
+
+        <form method="POST" action="/employee">
+            Employee ID:
+            <input name="eid" required><br>
+
+            Employee Name:
+            <input name="ename" required><br>
+
+            Designation:
+            <input name="designation" required><br>
+
+            Company:
+            <input name="company" required><br>
+
+            <button type="submit">Submit</button>
+        </form>
+    `);
 });
-app.listen(3000, () => console.log('http://localhost:3000'));
 
-Run: node employee.js; open http://localhost:3000
+app.post('/employee', (req, res) => {
+    const { eid, ename, designation, company } = req.body;
 
-Expected result: The submitted employee details appear in the response.
+    res.send(`
+        <h2>Employee Details</h2>
+        ID: ${eid}<br>
+        Name: ${ename}<br>
+        Designation: ${designation}<br>
+        Company: ${company}
+    `);
+});
 
-Unit 5 — MongoDB and MySQL
+app.listen(3000, () => {
+    console.log('http://localhost:3000');
+});
 
-Q19. Insert five book documents into MongoDB books collection
 
-Files / setup: Install: npm install mongodb. Start MongoDB locally or use your Atlas URI. Create insertBooks.js.
+Run: node employee.js
 
+Enter the details in the form and click Submit. The submitted employee information appears in the browser.
+Q21. Insert five documents into MongoDB books collection
+Install MongoDB driver:
+npm install mongodb
+
+
+Create insertBooks.js.
 const { MongoClient } = require('mongodb');
- 
+
 async function main() {
-  const uri = 'mongodb://127.0.0.1:27017';
-  const client = new MongoClient(uri);
-  try {
-    await client.connect();
-    const db = client.db('library');
-    const books = db.collection('books');
-    const result = await books.insertMany([
-      { title: 'Node Basics', author: 'A. Shah', year: 2022, price: 450 },
-      { title: 'JavaScript Guide', author: 'B. Rao', year: 2021, price: 650 },
-      { title: 'Web Development', author: 'C. Patil', year: 2023, price: 700 },
-      { title: 'Database Concepts', author: 'D. Joshi', year: 2020, price: 520 },
-      { title: 'Learning Express', author: 'E. Mehta', year: 2024, price: 390 }
-    ]);
-    console.log('Inserted documents:', result.insertedCount);
-  } catch (err) {
-    console.error(err.message);
-  } finally {
-    await client.close();
-  }
+    const client = new MongoClient(
+        'mongodb://127.0.0.1:27017'
+    );
+
+    try {
+        await client.connect();
+
+        const db = client.db('library');
+        const books = db.collection('books');
+
+        const result = await books.insertMany([
+            {
+                title: 'Node.js Basics',
+                author: 'Asha',
+                year: 2022,
+                price: 450
+            },
+            {
+                title: 'JavaScript Guide',
+                author: 'Rahul',
+                year: 2021,
+                price: 650
+            },
+            {
+                title: 'Web Development',
+                author: 'Priya',
+                year: 2023,
+                price: 700
+            },
+            {
+                title: 'Database Concepts',
+                author: 'Amit',
+                year: 2020,
+                price: 520
+            },
+            {
+                title: 'Express.js Guide',
+                author: 'Neha',
+                year: 2024,
+                price: 390
+            }
+        ]);
+
+        console.log('Inserted documents:', result.insertedCount);
+    } catch (err) {
+        console.log(err.message);
+    } finally {
+        await client.close();
+    }
 }
+
 main();
 
-Run: node insertBooks.js
 
-Expected result: Inserted documents: 5.
+Run:
+node insertBooks.js
 
-Exam note: If using MongoDB Atlas, replace the local URI with your connection string.
 
-Q20. Fetch books where price is greater than 500 using MongoDB
+Output:
+Inserted documents: 5
 
-Files / setup: Install: npm install mongodb. Create findBooks.js.
 
+The documents are inserted into the books collection in the library database.
+Q22. Fetch all books where price is greater than 500 using MongoDB
+Create findBooks.js.
 const { MongoClient } = require('mongodb');
- 
+
 async function main() {
-  const client = new MongoClient('mongodb://127.0.0.1:27017');
-  try {
-    await client.connect();
-    const books = client.db('library').collection('books');
-    const result = await books.find({ price: { $gt: 500 } }).toArray();
-    console.log(result);
-  } catch (err) {
-    console.error(err.message);
-  } finally {
-    await client.close();
-  }
+    const client = new MongoClient(
+        'mongodb://127.0.0.1:27017'
+    );
+
+    try {
+        await client.connect();
+
+        const db = client.db('library');
+        const books = db.collection('books');
+
+        const result = await books
+            .find({ price: { $gt: 500 } })
+            .toArray();
+
+        console.log(result);
+    } catch (err) {
+        console.log(err.message);
+    } finally {
+        await client.close();
+    }
 }
+
 main();
+
 
 Run: node findBooks.js
 
-Expected result: Displays all books with price above 500.
+Output: All books with a price greater than 500 are displayed.
 
-Exam note: $gt means “greater than” in MongoDB query syntax.
+Remember: $gt means greater than.
+Q23. MySQL functions to insert, fetch, update marks and delete a student record
+Create the database and table:
+CREATE DATABASE college_db;
+USE college_db;
 
-Q21. Upload a text file using Node.js
+CREATE TABLE students (
+    id INT PRIMARY KEY,
+    name VARCHAR(100),
+    course VARCHAR(50),
+    marks INT
+);
 
-Files / setup: Install: npm install express multer. Create uploadText.js.
 
-const express = require('express');
-const multer = require('multer');
-const fs = require('fs');
- 
-fs.mkdirSync('uploads', { recursive: true });
-const upload = multer({
-  dest: 'uploads/',
-  fileFilter: (req, file, cb) => {
-    const ok = file.mimetype === 'text/plain' ||
-      file.originalname.toLowerCase().endsWith('.txt');
-    cb(null, ok);
-  }
-});
-const app = express();
- 
-app.get('/', (req, res) => res.send(`
-  <form method="POST" action="/upload" enctype="multipart/form-data">
-    <input type="file" name="document" accept=".txt,text/plain" required>
-    <button>Upload text file</button>
-  </form>`));
- 
-app.post('/upload', upload.single('document'), (req, res) => {
-  if (!req.file) return res.status(400).send('Select a .txt file.');
-  res.send('Text file uploaded successfully: ' + req.file.originalname);
-});
-app.listen(3000, () => console.log('http://localhost:3000'));
+Install the package:
+npm install mysql2
 
-Run: node uploadText.js; open http://localhost:3000
 
-Expected result: The uploaded file is stored in the uploads folder.
-
-Exam note: For production, validate actual file content and restrict file size.
-
-Q22. MySQL CRUD functions: insert, fetch, update marks, delete student
-
-Files / setup: Question 22 introduces the operations continued in Q23. Install: npm install mysql2. Assumes students(rollno, name, marks) exists.
-
-// studentCrud.js
+Create studentCrud.js.
 const mysql = require('mysql2');
+
 const db = mysql.createConnection({
-  host: 'localhost', user: 'root',
-  password: 'YOUR_PASSWORD', database: 'college'
+    host: 'localhost',
+    user: 'root',
+    password: 'YOUR_PASSWORD',
+    database: 'college_db'
 });
- 
-function insertStudent(rollno, name, marks) {
-  db.execute('INSERT INTO students (rollno, name, marks) VALUES (?, ?, ?)',
-    [rollno, name, marks], console.log);
-}
-function fetchStudents() {
-  db.query('SELECT * FROM students', (err, rows) => {
-    if (err) return console.error(err.message);
-    console.table(rows);
-  });
-}
-function updateMarks(rollno, marks) {
-  db.execute('UPDATE students SET marks = ? WHERE rollno = ?',
-    [marks, rollno], console.log);
-}
-function deleteStudent(rollno) {
-  db.execute('DELETE FROM students WHERE rollno = ?',
-    [rollno], console.log);
-}
- 
+
 db.connect(err => {
-  if (err) throw err;
-  insertStudent(101, 'Asha', 85);
-  setTimeout(() => fetchStudents(), 300);
-  setTimeout(() => updateMarks(101, 92), 600);
-  setTimeout(() => fetchStudents(), 900);
-  setTimeout(() => deleteStudent(101), 1200);
-  setTimeout(() => db.end(), 1500);
+    if (err) throw err;
+    console.log('Connected to MySQL');
+
+    insertStudent(1, 'Asha', 'MCA', 85);
 });
+
+function insertStudent(id, name, course, marks) {
+    db.execute(
+        'INSERT INTO students VALUES (?, ?, ?, ?)',
+        [id, name, course, marks],
+        err => {
+            if (err) throw err;
+            console.log('Student inserted');
+            fetchStudents();
+        }
+    );
+}
+
+function fetchStudents() {
+    db.query('SELECT * FROM students', (err, rows) => {
+        if (err) throw err;
+        console.table(rows);
+        updateMarks(1, 95);
+    });
+}
+
+function updateMarks(id, marks) {
+    db.execute(
+        'UPDATE students SET marks = ? WHERE id = ?',
+        [marks, id],
+        err => {
+            if (err) throw err;
+            console.log('Marks updated');
+            deleteStudent(id);
+        }
+    );
+}
+
+function deleteStudent(id) {
+    db.execute(
+        'DELETE FROM students WHERE id = ?',
+        [id],
+        err => {
+            if (err) throw err;
+            console.log('Student deleted');
+            db.end();
+        }
+    );
+}
+
 
 Run: node studentCrud.js
 
-Expected result: Demonstrates insert, fetch, update and delete operations.
+Output includes:
+Connected to MySQL
+Student inserted
+Marks updated
+Student deleted
 
-Exam note: Question 22 has no separate detailed requirement in the bank; Q23 specifies the four MySQL operations. In actual work, use async sequencing instead of timers.
 
-Q23. Insert, fetch, update marks and delete a student using MySQL
+The program demonstrates all four operations. The record is inserted, fetched, updated and then deleted. The fetch operation prints the record before the update.
+Q24. Build a REST API in Node.js + Express for CRUD operations on the students table
+Install:
+npm install express mysql2
 
-Files / setup: Use the complete studentCrud.js solution in Q22. Create the database/table first.
 
-CREATE DATABASE college;
-USE college;
+Create the table in MySQL:
+CREATE DATABASE college_db;
+USE college_db;
+
 CREATE TABLE students (
-  rollno INT PRIMARY KEY,
-  name VARCHAR(100) NOT NULL,
-  marks INT
+    id INT PRIMARY KEY,
+    name VARCHAR(100),
+    course VARCHAR(50),
+    marks INT
 );
 
-Run: Run the SQL setup in MySQL, then node studentCrud.js
 
-Expected result: The script demonstrates all four CRUD operations.
-
-Exam note: Q23 is the detailed version of Q22.
-
-Q24. Fetch Student table records and display them in an HTML table using MySQL
-
-Files / setup: Install: npm install express mysql2. Assumes database college and table students(rollno, name, marks). Create app.js.
-
+Create studentApi.js.
 const express = require('express');
 const mysql = require('mysql2');
+
 const app = express();
+app.use(express.json());
+
 const db = mysql.createConnection({
-  host: 'localhost', user: 'root',
-  password: 'YOUR_PASSWORD', database: 'college'
-});
- 
-app.get('/', (req, res) => {
-  db.query('SELECT * FROM students', (err, rows) => {
-    if (err) return res.status(500).send('Database query failed.');
-    const body = rows.map(s => `<tr>
-      <td>${s.rollno}</td><td>${s.name}</td><td>${s.marks}</td>
-      </tr>`).join('');
-    res.send(`<h2>Students</h2><table border="1" cellpadding="6">
-      <tr><th>Roll No</th><th>Name</th><th>Marks</th></tr>
-      ${body}</table>`);
-  });
-});
-app.listen(3000, () => console.log('http://localhost:3000'));
-
-Run: node app.js; open http://localhost:3000
-
-Expected result: The browser shows all student rows in an HTML table.
-
-Exam note: Escape database values before inserting them into HTML in production to prevent cross-site scripting.
-
-Q25. Display all records from students table using MySQL
-
-Files / setup: Install: npm install mysql2. Assumes database college and table students exist. Create showStudents.js.
-
-const mysql = require('mysql2');
-const db = mysql.createConnection({
-  host: 'localhost', user: 'root',
-  password: 'YOUR_PASSWORD', database: 'college'
-});
- 
-db.connect(err => {
-  if (err) throw err;
-  db.query('SELECT * FROM students', (err, rows) => {
-    if (err) throw err;
-    console.table(rows);
-    db.end();
-  });
+    host: 'localhost',
+    user: 'root',
+    password: 'YOUR_PASSWORD',
+    database: 'college_db'
 });
 
-Run: node showStudents.js
+// CREATE: Insert student
+app.post('/students', (req, res) => {
+    const { id, name, course, marks } = req.body;
 
-Expected result: All records are displayed in the terminal as a table.
+    db.execute(
+        'INSERT INTO students VALUES (?, ?, ?, ?)',
+        [id, name, course, marks],
+        (err, result) => {
+            if (err) return res.status(500).json({ error: err.message });
 
-Q26. Display the list of programs offered by your university on a web page
+            res.status(201).json({ message: 'Student inserted' });
+        }
+    );
+});
 
-Files / setup: Install Express: npm install express. Create programs.js. Replace the sample list with your university's actual programs.
+// READ: Fetch all students
+app.get('/students', (req, res) => {
+    db.query('SELECT * FROM students', (err, rows) => {
+        if (err) return res.status(500).json({ error: err.message });
 
+        res.json(rows);
+    });
+});
+
+// UPDATE: Update marks
+app.put('/students/:id', (req, res) => {
+    const { marks } = req.body;
+    const id = Number(req.params.id);
+
+    db.execute(
+        'UPDATE students SET marks = ? WHERE id = ?',
+        [marks, id],
+        (err, result) => {
+            if (err) return res.status(500).json({ error: err.message });
+
+            if (result.affectedRows === 0) {
+                return res.status(404).json({ message: 'Student not found' });
+            }
+
+            res.json({ message: 'Student updated' });
+        }
+    );
+});
+
+// DELETE: Delete student
+app.delete('/students/:id', (req, res) => {
+    const id = Number(req.params.id);
+
+    db.execute(
+        'DELETE FROM students WHERE id = ?',
+        [id],
+        (err, result) => {
+            if (err) return res.status(500).json({ error: err.message });
+
+            if (result.affectedRows === 0) {
+                return res.status(404).json({ message: 'Student not found' });
+            }
+
+            res.json({ message: 'Student deleted' });
+        }
+    );
+});
+
+app.listen(3000, () => {
+    console.log('Student API running on port 3000');
+});
+
+
+Run:
+node studentApi.js
+
+
+Test using Postman or another API client:
+Method	URL	Purpose
+POST	http://localhost:3000/students	Insert a student
+GET	http://localhost:3000/students	Fetch all students
+PUT	http://localhost:3000/students/1	Update marks for ID 1
+DELETE	http://localhost:3000/students/1	Delete student ID 1
+
+Example POST JSON body:
+{
+    "id": 1,
+    "name": "Asha",
+    "course": "MCA",
+    "marks": 85
+}
+
+
+Example PUT JSON body:
+{
+    "marks": 95
+}
+
+
+Q25. Build a REST API using Node.js + Express + MongoDB (Mongoose) for CRUD operations on books
+Install the packages:
+npm install express mongoose
+
+
+Create bookApi.js.
 const express = require('express');
+const mongoose = require('mongoose');
+
 const app = express();
- 
-const programs = [
-  'Master of Computer Applications (MCA)',
-  'Master of Business Administration (MBA)',
-  'Bachelor of Business Administration (BBA)',
-  'Bachelor of Computer Applications (BCA)'
-];
- 
-app.get('/', (req, res) => {
-  const list = programs.map(p => `<li>${p}</li>`).join('');
-  res.send(`<h1>University Programs</h1><ul>${list}</ul>`);
+app.use(express.json());
+
+// Connect to MongoDB
+mongoose.connect('mongodb://127.0.0.1:27017/library')
+    .then(() => console.log('MongoDB connected'))
+    .catch(err => console.log(err.message));
+
+// Define book schema
+const bookSchema = new mongoose.Schema({
+    title: String,
+    author: String,
+    year: Number,
+    price: Number
 });
- 
-app.listen(3000, () => console.log('http://localhost:3000'));
+
+const Book = mongoose.model('Book', bookSchema);
+
+// CREATE: Insert a book
+app.post('/books', async (req, res) => {
+    try {
+        const book = await Book.create(req.body);
+        res.status(201).json(book);
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
+});
+
+// READ: Fetch all books
+app.get('/books', async (req, res) => {
+    try {
+        const books = await Book.find();
+        res.json(books);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// UPDATE: Update a book
+app.put('/books/:id', async (req, res) => {
+    try {
+        const book = await Book.findByIdAndUpdate(
+            req.params.id,
+            req.body,
+            { new: true, runValidators: true }
+        );
+
+        if (!book) {
+            return res.status(404).json({ message: 'Book not found' });
+        }
+
+        res.json(book);
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
+});
+
+// DELETE: Delete a book
+app.delete('/books/:id', async (req, res) => {
+    try {
+        const book = await Book.findByIdAndDelete(req.params.id);
+
+        if (!book) {
+            return res.status(404).json({ message: 'Book not found' });
+        }
+
+        res.json({ message: 'Book deleted successfully' });
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
+});
+
+app.listen(3000, () => {
+    console.log('Book API running on port 3000');
+});
