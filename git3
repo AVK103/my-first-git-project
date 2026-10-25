@@ -1,0 +1,1275 @@
+I'll organize your entire lab assignment into a topic-wise practical record with the exact question, copy-paste commands, execution steps in Docker, and simple explanations. We'll cover MongoDB first, followed by Cassandra.
+
+The format will be useful for both your practical exam and viva.
+MongoDB & Cassandra Lab Manual — Practical Exam Edition
+Part 1: How to Run MongoDB Using Docker
+Before solving the MongoDB questions, set up Docker and MongoDB once. You can then execute the remaining MongoDB queries in the same environment.
+Practical 1: Install and Configure Docker
+Aim: To install Docker and verify that it is working.
+
+Step 1: Open Docker Desktop
+
+On Windows:
+1. Install Docker Desktop if it isn't already installed.
+2. Start Docker Desktop.
+3. Wait until Docker reports that the Docker Engine is running.
+4. Open PowerShell or the VS Code terminal.
+Official resources: Docker Desktop for Windows
+
+Step 2: Verify Docker installation
+
+Run these commands one by one:
+docker --version
+
+docker info
+
+docker run hello-world
+
+Expected result: The hello-world container runs successfully and displays a message confirming that Docker is working.
+Practical 2: Run a Basic Docker Container
+Aim: To run a container and practise the start, stop, and exec commands.
+
+Step 1: Create a container
+docker run -d --name test-container nginx
+
+Step 2: Display running containers
+docker ps
+
+Step 3: Stop the container
+docker stop test-container
+
+Step 4: Start the container again
+docker start test-container
+
+Step 5: Execute a command inside the container
+docker exec test-container nginx -v
+
+Step 6: Remove the container
+docker stop test-container
+
+docker rm test-container
+
+Remember these commands:
+Command	Purpose
+docker ps	Show running containers
+docker ps -a	Show all containers
+docker start NAME	Start an existing container
+docker stop NAME	Stop a running container
+docker exec -it NAME bash	Open a shell inside a container that has Bash
+docker rm NAME	Remove a stopped container
+docker images	Show downloaded images
+
+
+Practical 3: Deploy MongoDB Using Docker
+Aim: To deploy MongoDB in a Docker container and connect to the database.
+Step 1: Download the MongoDB image
+docker pull mongo:8
+
+Step 2: Run MongoDB
+docker run -d --name mongodb -p 27017:27017 -v mongodb_data:/data/db mongo:8
+
+What does this command mean?
+- -d — Run the container in the background.
+- --name mongodb — Name the container mongodb.
+- -p 27017:27017 — Map the host port to the MongoDB container port.
+- -v mongodb_data:/data/db — Store database files in a persistent Docker volume.
+- mongo:8 — Use the MongoDB version 8 image.
+Step 3: Verify the container
+docker ps
+
+You should see a container named mongodb.
+Step 4: Connect to MongoDB
+docker exec -it mongodb mongosh
+
+You should now see the MongoDB shell prompt.
+
+Important: All the MongoDB commands in the following sections should be entered inside mongosh, not directly into PowerShell.
+
+For example:
+show dbs
+
+To exit the MongoDB shell:
+exit
+
+If the container already exists: Do not run the same docker run command again. Instead, use:
+docker start mongodb
+
+Then reconnect:
+docker exec -it mongodb mongosh
+
+Official reference: MongoDB Docker installation guide
+Part 2: MongoDB Database, Collection and CRUD Operations
+Practical 4: Create a Database and Collection
+Question: Create a MongoDB database named college and a collection named students.
+
+Commands:
+use college
+
+db.createCollection("students")
+
+Insert sample student records:
+
+We'll use the same sample data throughout the MongoDB practicals so you can practise all the queries without creating new data each time.
+db.students.insertMany([
+  {
+    rollNo: 101,
+    name: "Amit",
+    age: 21,
+    gender: "Male",
+    city: "Pune",
+    course: "MCA",
+    department: "Computer",
+    marks: 85,
+    attendance: 90,
+    fees: 50000,
+    cgpa: 8.5
+  },
+  {
+    rollNo: 102,
+    name: "Sneha",
+    age: 20,
+    gender: "Female",
+    city: "Mumbai",
+    course: "MCA",
+    department: "Computer",
+    marks: 92,
+    attendance: 95,
+    fees: 52000,
+    cgpa: 9.1
+  },
+  {
+    rollNo: 103,
+    name: "Rahul",
+    age: 22,
+    gender: "Male",
+    city: "Pune",
+    course: "BCA",
+    department: "Computer",
+    marks: 76,
+    attendance: 85,
+    fees: 40000,
+    cgpa: 7.8
+  },
+  {
+    rollNo: 104,
+    name: "Priya",
+    age: 18,
+    gender: "Female",
+    city: "Nashik",
+    course: "MCA",
+    department: "IT",
+    marks: 68,
+    attendance: 80,
+    fees: 48000,
+    cgpa: 7.2
+  },
+  {
+    rollNo: 105,
+    name: "Rohan",
+    age: 23,
+    gender: "Male",
+    city: "Mumbai",
+    course: "BCA",
+    department: "IT",
+    marks: 88,
+    attendance: 88,
+    fees: 42000,
+    cgpa: 8.2
+  },
+  {
+    rollNo: 106,
+    name: "Neha",
+    age: 21,
+    gender: "Female",
+    city: "Pune",
+    course: "MCA",
+    department: "Computer",
+    marks: 95,
+    attendance: 98,
+    fees: 55000,
+    cgpa: 9.5
+  },
+  {
+    rollNo: 107,
+    name: "Karan",
+    age: 19,
+    gender: "Male",
+    city: "Nagpur",
+    course: "BSc",
+    department: "Science",
+    marks: 72,
+    attendance: 78,
+    fees: 35000,
+    cgpa: 7.0
+  },
+  {
+    rollNo: 108,
+    name: "Pooja",
+    age: 22,
+    gender: "Female",
+    city: "Pune",
+    course: "MCA",
+    department: "IT",
+    marks: 81,
+    attendance: 92,
+    fees: 51000,
+    cgpa: 8.4
+  },
+  {
+    rollNo: 109,
+    name: "Vikas",
+    age: 20,
+    gender: "Male",
+    city: "Mumbai",
+    course: "BCA",
+    department: "Computer",
+    marks: 65,
+    attendance: 75,
+    fees: 39000,
+    cgpa: 6.8
+  },
+  {
+    rollNo: 110,
+    name: "Anita",
+    age: 24,
+    gender: "Female",
+    city: "Pune",
+    course: "MCA",
+    department: "Computer",
+    marks: 90,
+    attendance: 96,
+    fees: 53000,
+    cgpa: 9.0
+  }
+])
+
+Verify the inserted records:
+db.students.find()
+
+Display the records in a readable format:
+db.students.find().pretty()
+
+Practical 5: Perform CRUD Operations
+Question 1: Insert a new student.
+db.students.insertOne({
+  rollNo: 111,
+  name: "Ajay",
+  age: 21,
+  city: "Pune",
+  course: "MCA",
+  department: "Computer",
+  marks: 75,
+  fees: 45000,
+  cgpa: 7.5
+})
+
+Question 2: Read all student records.
+db.students.find()
+
+Question 3: Update the marks of a student.
+db.students.updateOne(
+  { rollNo: 111 },
+  { $set: { marks: 85 } }
+)
+
+Question 4: Delete a student.
+db.students.deleteOne({ rollNo: 111 })
+
+Remember CRUD:
+Operation	MongoDB command
+Create	insertOne() / insertMany()
+Read	find() / findOne()
+Update	updateOne() / updateMany()
+Delete	deleteOne() / deleteMany()
+
+
+The sample dataset is now ready for the remaining practical questions.
+Part 3: MongoDB Operators — Practical Questions and Answers
+Collection: students
+Database: college
+
+Before running the queries, ensure you are using the correct database:
+use college
+
+Topic A: Comparison Operators
+These operators compare values in MongoDB.
+Operator	Meaning
+$gt	Greater than
+$lt	Less than
+$gte	Greater than or equal to
+$lte	Less than or equal to
+$ne	Not equal to
+
+
+Q6(a). Display all students whose age is greater than 20.
+db.students.find({ age: { $gt: 20 } })
+
+Q6(b). Display students whose marks are less than 75.
+db.students.find({ marks: { $lt: 75 } })
+
+Q6(c). Display students whose age is greater than or equal to 21.
+db.students.find({ age: { $gte: 21 } })
+
+Q6(d). Display students whose marks are less than or equal to 80.
+db.students.find({ marks: { $lte: 80 } })
+
+Q6(e). Display students whose city is not Pune.
+db.students.find({ city: { $ne: "Pune" } })
+
+Easy trick to remember:
+- $gt = Greater than
+- $lt = Less than
+- $gte = Greater than or equal to
+- $lte = Less than or equal to
+- $ne = Not equal
+Topic B: Logical Operators
+Operator	Meaning
+$and	All conditions must be true
+$or	At least one condition must be true
+$not	Negates a condition
+$nor	None of the conditions must be true
+
+
+Q6(f). Display students whose age is greater than 20 AND marks are greater than 80.
+db.students.find({
+  $and: [
+    { age: { $gt: 20 } },
+    { marks: { $gt: 80 } }
+  ]
+})
+
+Shorter alternative:
+db.students.find({
+  age: { $gt: 20 },
+  marks: { $gt: 80 }
+})
+
+Both conditions must be satisfied.
+Q6(g). Display students whose city is Pune OR Mumbai.
+db.students.find({
+  $or: [
+    { city: "Pune" },
+    { city: "Mumbai" }
+  ]
+})
+
+Q6(h). Display students whose age is NOT greater than 20.
+db.students.find({
+  age: { $not: { $gt: 20 } }
+})
+
+This includes students aged 20 or younger.
+Q6(i). Display students whose course is MCA AND city is Pune.
+db.students.find({
+  course: "MCA",
+  city: "Pune"
+})
+
+Q6(j). Display students whose marks are greater than 90 OR age is less than 19.
+db.students.find({
+  $or: [
+    { marks: { $gt: 90 } },
+    { age: { $lt: 19 } }
+  ]
+})
+
+Exam tip: Conditions on different fields are automatically combined using AND when written in the same query document.
+Topic C: Projection
+Projection controls which fields appear in the result.
+- 1 means include a field.
+- 0 means exclude a field.
+- _id is included by default unless explicitly excluded.
+Q6(k). Display only the name of all students.
+db.students.find({}, { name: 1, _id: 0 })
+
+Q6(l). Display only the name and age of all students.
+db.students.find({}, {
+  name: 1,
+  age: 1,
+  _id: 0
+})
+
+Q6(m). Display all fields except the city.
+db.students.find({}, { city: 0 })
+
+Q6(n). Display only the name and marks, excluding the _id field.
+db.students.find({}, {
+  name: 1,
+  marks: 1,
+  _id: 0
+})
+
+Q6(o). Display only the names of students whose age is greater than 20.
+db.students.find(
+  { age: { $gt: 20 } },
+  { name: 1, _id: 0 }
+)
+
+Easy trick: find(condition, projection).
+
+The first object filters records. The second object controls which fields are displayed.
+Part 4: Sorting, Limiting, Skipping and Counting
+Q7(a). Display all students in ascending order of marks.
+db.students.find().sort({ marks: 1 })
+
+1 means ascending order.
+Q7(b). Display all students in descending order of age.
+db.students.find().sort({ age: -1 })
+
+-1 means descending order.
+Q7(c). Display the first 5 students.
+db.students.find().limit(5)
+
+Q7(d). Display the top 3 students with the highest marks.
+db.students.find().sort({ marks: -1 }).limit(3)
+
+Logic: Sort marks from highest to lowest, then display three records.
+Q7(e). Skip the first 2 students and display the remaining records.
+db.students.find().skip(2)
+
+Q7(f). Display the 4th to 6th students using skip() and limit().
+db.students.find().skip(3).limit(3)
+
+Why skip(3)? Because the first three records are skipped, and the next three are displayed.
+Q7(g). Count the total number of students.
+db.students.countDocuments({})
+
+Q7(h). Count students whose marks are greater than 70.
+db.students.countDocuments({
+  marks: { $gt: 70 }
+})
+
+Q7(i). Display all unique cities.
+db.students.distinct("city")
+
+Q7(j). Display all unique courses.
+db.students.distinct("course")
+
+Q7(k). Display the top 5 students by marks, showing only name and marks.
+db.students.find(
+  {},
+  { name: 1, marks: 1, _id: 0 }
+).sort({ marks: -1 }).limit(5)
+
+Q7(l). Count MCA students and display the unique cities where MCA students belong.
+Count MCA students:
+db.students.countDocuments({ course: "MCA" })
+
+Display unique cities of MCA students:
+db.students.distinct("city", { course: "MCA" })
+
+Part 5: MongoDB Update Operators
+Collection: students
+
+These questions use student Roll No. 101.
+
+Important: The following operations modify the database. Execute them in the specified order if you want to observe their combined effects.
+Q1. $set — Update marks of the student with Roll No. 101 to 90.
+db.students.updateOne(
+  { rollNo: 101 },
+  { $set: { marks: 90 } }
+)
+
+Meaning: Sets the marks field to 90.
+Q2. $unset — Remove the city field from the student whose Roll No. is 101.
+db.students.updateOne(
+  { rollNo: 101 },
+  { $unset: { city: "" } }
+)
+
+Meaning: Removes the city field entirely.
+Q3. $inc — Increase the fees of the student with Roll No. 101 by ₹5,000.
+db.students.updateOne(
+  { rollNo: 101 },
+  { $inc: { fees: 5000 } }
+)
+
+Meaning: Adds 5,000 to the existing fees.
+Q4. $mul — Double the fees of the student with Roll No. 101.
+db.students.updateOne(
+  { rollNo: 101 },
+  { $mul: { fees: 2 } }
+)
+
+Meaning: Multiplies the existing fees by 2.
+Q5. $rename — Rename the field marks to score for Roll No. 101.
+db.students.updateOne(
+  { rollNo: 101 },
+  { $rename: { marks: "score" } }
+)
+
+Meaning: Renames the field. Its value is preserved.
+
+Note: $rename applies to the specified document's update operation, but the field name change affects the document's schema, so the document will have score instead of marks.
+Q6. $min — Update CGPA to 7.5 only if the new value is smaller than the existing value.
+db.students.updateOne(
+  { rollNo: 101 },
+  { $min: { cgpa: 7.5 } }
+)
+
+Meaning: If the existing CGPA is greater than 7.5, it becomes 7.5. Otherwise, it remains unchanged.
+Q7. $max — Update marks to 95 only if the new value is greater than the existing value.
+db.students.updateOne(
+  { rollNo: 101 },
+  { $max: { marks: 95 } }
+)
+
+Meaning: Updates marks to 95 only if the existing value is lower than 95.
+
+Important: If you previously renamed marks to score, this query creates or updates marks separately. Run the $rename question again on a fresh document if you want to demonstrate it independently.
+Q8. $currentDate — Add or update lastModified with the current date and time.
+db.students.updateOne(
+  { rollNo: 101 },
+  { $currentDate: { lastModified: true } }
+)
+
+Meaning: Sets lastModified to the current date and time.
+Quick Revision: Update Operators
+Operator	Function
+$set	Set a value
+$unset	Remove a field
+$inc	Increase or decrease a number
+$mul	Multiply a number
+$rename	Rename a field
+$min	Keep the smaller value
+$max	Keep the larger value
+$currentDate	Set the current date/time
+
+
+Part 6: MongoDB Indexing
+Collection: students
+
+An index helps MongoDB find records more efficiently.
+Q1. Create an ascending index on the name field.
+db.students.createIndex({ name: 1 })
+
+Expected index name:
+name_1
+
+Q2. Create a compound index on department ascending and marks descending.
+db.students.createIndex({
+  department: 1,
+  marks: -1
+})
+
+Expected index name:
+department_1_marks_-1
+
+Note: Your original schema lists course, not department. The sample dataset in this manual contains both fields, so this query will work. If your actual dataset contains only course, replace department with course.
+Q3. Display all indexes created on the students collection.
+db.students.getIndexes()
+
+The result includes the default _id_ index and any additional indexes.
+Q4. Drop the index created on the name field and verify that it has been removed.
+Step 1: Drop the index.
+db.students.dropIndex("name_1")
+
+Step 2: Verify.
+db.students.getIndexes()
+
+The name_1 index should no longer appear.
+
+Quick revision:
+- Create index: createIndex()
+- View indexes: getIndexes()
+- Delete index: dropIndex()
+- Ascending: 1
+- Descending: -1
+Part 7: MongoDB Aggregation Pipeline
+Collection: students
+
+Aggregation is used to filter, group, and summarize data.
+
+Your assignment specifies the operators $match, $group, $push, and $$ROOT. The solutions below use those where relevant, along with $sum to count records.
+Q1. Display all students who scored more than 70 marks using $match.
+db.students.aggregate([
+  {
+    $match: { marks: { $gt: 70 } }
+  }
+])
+
+Meaning: Filters students with marks greater than 70.
+Q2. Group students by course and count the total students.
+db.students.aggregate([
+  {
+    $group: {
+      _id: "$course",
+      totalStudents: { $sum: 1 }
+    }
+  }
+])
+
+Q3. Group students by city and count the number of students in each city.
+db.students.aggregate([
+  {
+    $group: {
+      _id: "$city",
+      totalStudents: { $sum: 1 }
+    }
+  }
+])
+
+Q4. Display departments having more than 2 students.
+db.students.aggregate([
+  {
+    $group: {
+      _id: "$department",
+      totalStudents: { $sum: 1 }
+    }
+  },
+  {
+    $match: {
+      totalStudents: { $gt: 2 }
+    }
+  }
+])
+
+Important correction: The question says more than 2 students, so the condition must be $gt: 2, not $gt: 5.
+Q5. Group students by department and display the names of all students.
+db.students.aggregate([
+  {
+    $group: {
+      _id: "$department",
+      studentNames: { $push: "$name" }
+    }
+  }
+])
+
+Q6. Group students by city and store complete student documents in an array.
+db.students.aggregate([
+  {
+    $group: {
+      _id: "$city",
+      students: { $push: "$$ROOT" }
+    }
+  }
+])
+
+Remember:
+- $push adds values to an array.
+- $$ROOT represents the complete current document.
+Q7. Display students from the Computer department, then group by city and count students.
+db.students.aggregate([
+  {
+    $match: { department: "Computer" }
+  },
+  {
+    $group: {
+      _id: "$city",
+      totalStudents: { $sum: 1 }
+    }
+  }
+])
+
+Q8. Group students by department and display the total number and complete student records.
+db.students.aggregate([
+  {
+    $group: {
+      _id: "$department",
+      totalStudents: { $sum: 1 },
+      students: { $push: "$$ROOT" }
+    }
+  }
+])
+
+Q9. Display students with marks greater than 75, group by department, and store names in an array.
+db.students.aggregate([
+  {
+    $match: { marks: { $gt: 75 } }
+  },
+  {
+    $group: {
+      _id: "$department",
+      studentNames: { $push: "$name" }
+    }
+  }
+])
+
+Q10. Group students by city, display the count and complete records, and show only cities with more than 3 students.
+db.students.aggregate([
+  {
+    $group: {
+      _id: "$city",
+      totalStudents: { $sum: 1 },
+      students: { $push: "$$ROOT" }
+    }
+  },
+  {
+    $match: {
+      totalStudents: { $gt: 3 }
+    }
+  }
+])
+
+Easy way to remember aggregation:
+Stage or operator	Purpose
+$match	Filter records
+$group	Group records
+$sum: 1	Count records
+$push	Create an array
+$$ROOT	Store the complete document
+
+
+Execution format:
+db.students.aggregate([
+  { $match: { /* condition */ } },
+  { $group: { /* grouping logic */ } }
+])
+
+You can use this structure as a template for many aggregation questions.
+Part 8: Real-Life MongoDB Database — Amazon/Flipkart Orders
+Database: shoppingDB
+Collection: orders
+
+This section covers $unwind, $sum, $avg, $max, $min, $ifNull, $filter, $group, $push, and $$ROOT.
+Step 1. Create the database
+Run inside mongosh:
+use shoppingDB
+
+Step 2. Create the collection
+db.createCollection("orders")
+
+If the collection already exists, you can skip this step.
+Step 3. Insert sample data
+For a manageable practical dataset, use the following three orders. They contain all the fields needed to practise the operators.
+db.orders.insertMany([
+  {
+    orderId: 1001,
+    customerName: "Rahul Sharma",
+    city: "Pune",
+    products: [
+      {
+        productName: "Laptop",
+        category: "Electronics",
+        price: 65000,
+        quantity: 1
+      },
+      {
+        productName: "Mouse",
+        category: "Electronics",
+        price: 800,
+        quantity: 2
+      }
+    ],
+    couponDiscount: 1000,
+    deliveryCharge: 100,
+    totalAmount: 65700
+  },
+  {
+    orderId: 1002,
+    customerName: "Sneha Patil",
+    city: "Mumbai",
+    products: [
+      {
+        productName: "Mobile",
+        category: "Electronics",
+        price: 25000,
+        quantity: 1
+      },
+      {
+        productName: "Headphones",
+        category: "Electronics",
+        price: 2500,
+        quantity: 1
+      }
+    ],
+    couponDiscount: null,
+    deliveryCharge: 0,
+    totalAmount: 27500
+  },
+  {
+    orderId: 1003,
+    customerName: "Amit Joshi",
+    city: "Pune",
+    products: [
+      {
+        productName: "Shirt",
+        category: "Fashion",
+        price: 1500,
+        quantity: 2
+      },
+      {
+        productName: "Jeans",
+        category: "Fashion",
+        price: 2200,
+        quantity: 1
+      }
+    ],
+    couponDiscount: 500,
+    deliveryCharge: 50,
+    totalAmount: 4700
+  }
+])
+
+Verify the records:
+db.orders.find()
+
+If you already inserted the original 10 orders from your assignment, do not insert these three additional records unless you want a combined dataset. The queries below work with either dataset.
+
+Q1. $unwind — Display each product in every order as a separate document.
+db.orders.aggregate([
+  {
+    $unwind: "$products"
+  }
+])
+
+Meaning: Converts each product array element into its own output document.
+Q2. $sum — Calculate total revenue generated from each product category.
+db.orders.aggregate([
+  {
+    $unwind: "$products"
+  },
+  {
+    $group: {
+      _id: "$products.category",
+      totalRevenue: {
+        $sum: {
+          $multiply: [
+            "$products.price",
+            "$products.quantity"
+          ]
+        }
+      }
+    }
+  }
+])
+
+Logic: Revenue = product price × quantity, summed for each category.
+Q3. $avg — Find the average order value for each city.
+db.orders.aggregate([
+  {
+    $group: {
+      _id: "$city",
+      averageOrder: {
+        $avg: "$totalAmount"
+      }
+    }
+  }
+])
+
+Q4. $max — Find the most expensive product sold in each category.
+db.orders.aggregate([
+  {
+    $unwind: "$products"
+  },
+  {
+    $group: {
+      _id: "$products.category",
+      highestPrice: {
+        $max: "$products.price"
+      }
+    }
+  }
+])
+
+Q5. $min — Find the cheapest product in each category.
+db.orders.aggregate([
+  {
+    $unwind: "$products"
+  },
+  {
+    $group: {
+      _id: "$products.category",
+      lowestPrice: {
+        $min: "$products.price"
+      }
+    }
+  }
+])
+
+Q6. $ifNull — Display the customer name and coupon discount. Display 0 if the coupon is null or missing.
+db.orders.aggregate([
+  {
+    $project: {
+      _id: 0,
+      customerName: 1,
+      couponDiscount: {
+        $ifNull: [
+          "$couponDiscount",
+          0
+        ]
+      }
+    }
+  }
+])
+
+Meaning: Replaces a null or missing coupon value with 0.
+Q7. $filter — Display only products costing more than ₹20,000 in each order.
+db.orders.aggregate([
+  {
+    $project: {
+      customerName: 1,
+      expensiveProducts: {
+        $filter: {
+          input: "$products",
+          as: "item",
+          cond: {
+            $gt: [
+              "$$item.price",
+              20000
+            ]
+          }
+        }
+      }
+    }
+  }
+])
+
+Meaning:
+- input specifies the array.
+- as gives each array element a temporary name.
+- cond specifies the filtering condition.
+- $$item.price accesses the current product's price.
+Q8. $filter — Display only Electronics products purchased in each order.
+db.orders.aggregate([
+  {
+    $project: {
+      customerName: 1,
+      electronics: {
+        $filter: {
+          input: "$products",
+          as: "item",
+          cond: {
+            $eq: [
+              "$$item.category",
+              "Electronics"
+            ]
+          }
+        }
+      }
+    }
+  }
+])
+
+Q9. $unwind, $group, $sum — Find the total quantity sold for each product.
+db.orders.aggregate([
+  {
+    $unwind: "$products"
+  },
+  {
+    $group: {
+      _id: "$products.productName",
+      quantitySold: {
+        $sum: "$products.quantity"
+      }
+    }
+  }
+])
+
+Meaning: Groups identical product names and adds their quantities.
+Q10. $group, $push, $$ROOT — Group orders by city and display complete order details.
+db.orders.aggregate([
+  {
+    $group: {
+      _id: "$city",
+      orders: {
+        $push: "$$ROOT"
+      }
+    }
+  }
+])
+
+Meaning: Creates one output document per city, with an array containing the complete order documents from that city.
+Quick Revision: Orders Practical
+Question	Operators
+Q1	$unwind
+Q2	$unwind, $group, $sum, $multiply
+Q3	$group, $avg
+Q4	$unwind, $group, $max
+Q5	$unwind, $group, $min
+Q6	$project, $ifNull
+Q7	$project, $filter, $gt
+Q8	$project, $filter, $eq
+Q9	$unwind, $group, $sum
+Q10	$group, $push, $$ROOT
+
+
+Part 9: How to Run Cassandra Using Docker
+MongoDB and Cassandra are different database systems. You can run both using Docker, but you must connect to the appropriate container for each practical.
+
+Cassandra uses CQL (Cassandra Query Language), not MongoDB's mongosh commands.
+
+Official reference: Apache Cassandra Docker image
+Practical 1. Start Cassandra
+Step 1: Download the image
+Open PowerShell or the VS Code terminal:
+docker pull cassandra:5.0
+
+Step 2: Start the Cassandra container
+docker run -d --name cassandra-db -p 9042:9042 cassandra:5.0
+
+Port 9042 is the default Cassandra native transport port.
+Step 3: Check the container
+docker ps
+
+Cassandra may take some time to initialise on its first run.
+
+Check the logs:
+docker logs -f cassandra-db
+
+Wait for Cassandra to finish starting, then press Ctrl+C to exit the log display. This does not stop the container.
+Step 4: Open the Cassandra query shell
+docker exec -it cassandra-db cqlsh
+
+You should now see the cqlsh> prompt.
+
+Important: Enter the following Cassandra commands at cqlsh>, not at mongosh> or the PowerShell prompt.
+Part 10: Cassandra — Create Keyspace and Table
+Practical 2. Create the College Keyspace
+Question: Create a keyspace named college using SimpleStrategy and replication factor 1.
+CREATE KEYSPACE college
+WITH replication = {
+    'class': 'SimpleStrategy',
+    'replication_factor': 1
+};
+
+Select the keyspace:
+USE college;
+
+Meaning:
+- A keyspace is a top-level namespace for Cassandra tables.
+- SimpleStrategy is suitable for a simple single-data-centre lab.
+- replication_factor: 1 stores one replica of the data.
+Practical 3. Create the Student Table
+Question: Create a table with roll number, name, age, city, marks and grade.
+CREATE TABLE student (
+    roll_no int PRIMARY KEY,
+    name text,
+    age int,
+    city text,
+    marks double,
+    grade text
+);
+
+Remember: roll_no is the primary key, so it uniquely identifies a student.
+Practical 4. Insert 10 Student Records
+Run the following commands in cqlsh:
+INSERT INTO student
+(roll_no, name, age, city, marks, grade)
+VALUES (1, 'Amit', 21, 'Pune', 85, 'B');
+
+INSERT INTO student
+(roll_no, name, age, city, marks, grade)
+VALUES (2, 'Sneha', 20, 'Mumbai', 92, 'A');
+
+INSERT INTO student
+(roll_no, name, age, city, marks, grade)
+VALUES (3, 'Rahul', 22, 'Nashik', 78, 'C');
+
+INSERT INTO student
+(roll_no, name, age, city, marks, grade)
+VALUES (4, 'Priya', 21, 'Pune', 95, 'A');
+
+INSERT INTO student
+(roll_no, name, age, city, marks, grade)
+VALUES (5, 'Rohan', 23, 'Mumbai', 88, 'B');
+
+INSERT INTO student
+(roll_no, name, age, city, marks, grade)
+VALUES (6, 'Neha', 20, 'Pune', 91, 'A');
+
+INSERT INTO student
+(roll_no, name, age, city, marks, grade)
+VALUES (7, 'Karan', 22, 'Nashik', 96, 'A');
+
+INSERT INTO student
+(roll_no, name, age, city, marks, grade)
+VALUES (8, 'Pooja', 21, 'Pune', 72, 'C');
+
+INSERT INTO student
+(roll_no, name, age, city, marks, grade)
+VALUES (9, 'Vikas', 23, 'Mumbai', 84, 'B');
+
+INSERT INTO student
+(roll_no, name, age, city, marks, grade)
+VALUES (10, 'Anita', 20, 'Pune', 89, 'B');
+
+Verify the records:
+SELECT * FROM student;
+
+Part 11: Cassandra UPDATE Queries
+Database: college
+Table: student
+
+First, connect to Cassandra:
+docker exec -it cassandra-db cqlsh
+
+Then select the keyspace:
+USE college;
+
+Q1. Update the marks of the student whose roll number is 1 to 90.
+UPDATE student
+SET marks = 90
+WHERE roll_no = 1;
+
+Q2. Change the city of the student whose roll number is 2 to Mumbai.
+UPDATE student
+SET city = 'Mumbai'
+WHERE roll_no = 2;
+
+Q3. Change the grade of the student whose roll number is 3 to A.
+UPDATE student
+SET grade = 'A'
+WHERE roll_no = 3;
+
+Q4. Update both marks and grade for a particular student.
+Example: Update student 4.
+UPDATE student
+SET marks = 98, grade = 'A'
+WHERE roll_no = 4;
+
+Q5. Update the name and city of a student using roll number as the condition.
+Example: Update student 5.
+UPDATE student
+SET name = 'Rohan Patil',
+    city = 'Pune'
+WHERE roll_no = 5;
+
+Important: Cassandra requires the primary key in these updates. Here, roll_no identifies the student.
+Part 12: Cassandra SELECT / DQL Queries
+DQL means Data Query Language. These queries retrieve data from a table.
+Q1. Display all records from the student table.
+SELECT * FROM student;
+
+Q2. Display only the name and marks of all students.
+SELECT name, marks
+FROM student;
+
+Q3. Display the details of the student whose roll number is 3.
+SELECT *
+FROM student
+WHERE roll_no = 3;
+
+Q4. Display the names and grades of students.
+SELECT name, grade
+FROM student;
+
+Q5. Display the first 3 records using LIMIT.
+SELECT *
+FROM student
+LIMIT 3;
+
+Note: Cassandra does not guarantee that these are the first three records in a particular insertion order.
+Q6. Display students whose city is Pune.
+SELECT *
+FROM student
+WHERE city = 'Pune'
+ALLOW FILTERING;
+
+Q7. Display students whose marks are greater than 90.
+SELECT *
+FROM student
+WHERE marks > 90
+ALLOW FILTERING;
+
+Q8. Display students whose marks are between 70 and 90.
+SELECT *
+FROM student
+WHERE marks >= 70
+AND marks <= 90
+ALLOW FILTERING;
+
+Important for your viva: ALLOW FILTERING permits Cassandra to perform queries that may require scanning data instead of efficiently locating it through the primary key. It is acceptable for a small lab demonstration, but it should be used cautiously in real applications.
+
+For efficient queries, Cassandra tables should generally be designed around the queries the application needs to execute.
+Part 13: Cassandra DELETE Queries
+Cassandra supports deleting individual columns as well as complete rows.
+Q1. Delete the city column for student roll number 2.
+DELETE city
+FROM student
+WHERE roll_no = 2;
+
+Q2. Delete the grade column for student roll number 3.
+DELETE grade
+FROM student
+WHERE roll_no = 3;
+
+Q3. Delete both city and grade for student roll number 4.
+DELETE city, grade
+FROM student
+WHERE roll_no = 4;
+
+Q4. Delete the complete record of student roll number 4.
+DELETE FROM student
+WHERE roll_no = 4;
+
+Q5. Delete a student record using its primary key.
+Example: Delete student 6.
+DELETE FROM student
+WHERE roll_no = 6;
+
+Q6. Verify the deletion of a column.
+SELECT *
+FROM student
+WHERE roll_no = 2;
+
+The student's record remains, but the deleted city value is no longer present.
+Q7. Verify the deletion of a complete record.
+SELECT *
+FROM student
+WHERE roll_no = 4;
+
+The deleted record will not be returned.
+Difference Between Column Deletion and Row Deletion
+Question: Explain the difference between deleting a column value and deleting a complete row.
+Column deletion	Complete row deletion
+Removes a specified column value from one row.	Deletes the entire row.
+Other column values remain.	All values belonging to the row are removed.
+Example: DELETE city FROM student WHERE roll_no = 2;	Example: DELETE FROM student WHERE roll_no = 2;
+
+
+Easy trick: If the column name appears after DELETE, only that column is deleted. If no column name appears, the complete row is deleted.
+Part 14: Cassandra — Integrated Practical Questions
+These are useful additional questions from your assignment.
+Q1. Update marks of three students.
+UPDATE student SET marks = 90 WHERE roll_no = 1;
+UPDATE student SET marks = 95 WHERE roll_no = 3;
+UPDATE student SET marks = 93 WHERE roll_no = 5;
+
+Q2. Change the grade of student 2 to O.
+UPDATE student
+SET grade = 'O'
+WHERE roll_no = 2;
+
+Verify:
+SELECT *
+FROM student
+WHERE roll_no = 2;
+
+Q3. Delete the city of student 4.
+DELETE city
+FROM student
+WHERE roll_no = 4;
+
+Q4. Delete the grade of student 5.
+DELETE grade
+FROM student
+WHERE roll_no = 5;
+
+Q5. Delete student 10.
+DELETE FROM student
+WHERE roll_no = 10;
+
+Q6. Display the remaining records.
+SELECT * FROM student;
+
+Q7. Why can't we use a SQL-style UPDATE with a non-primary-key condition?
+Question:
+
+Why is the following query not supported as a general Cassandra update?
+UPDATE student
+SET grade = 'O'
+WHERE marks > 90;
+
+Answer: Cassandra normally requires the primary key to identify the row being updated. Since marks is not part of the primary key, this query is not supported for the table as defined.
+
+First, find the matching students:
+SELECT roll_no
+FROM student
+WHERE marks > 90
+ALLOW FILTERING;
+
+Then update each student individually using their primary key:
+UPDATE student
+SET grade = 'O'
+WHERE roll_no = 2;
