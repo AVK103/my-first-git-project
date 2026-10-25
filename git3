@@ -1,20 +1,18 @@
-I'll organize your entire lab assignment into a topic-wise practical record with the exact question, copy-paste commands, execution steps in Docker, and simple explanations. We'll cover MongoDB first, followed by Cassandra.
+Since you'll be using Docker for your MongoDB practical, here are copyable commands for Windows PowerShell or CMD. These cover running MongoDB and practicing CRUD and aggregation.
+1. Start MongoDB Using Docker
+Step 1: Download the MongoDB image
+docker pull mongo:latest
 
-The format will be useful for both your practical exam and viva.
-MongoDB & Cassandra Lab Manual — Practical Exam Edition
-Part 1: How to Run MongoDB Using Docker
-Before solving the MongoDB questions, set up Docker and MongoDB once. You can then execute the remaining MongoDB queries in the same environment.
-Practical 1: Install and Configure Docker
-Aim: To install Docker and verify that it is working.
+Step 2: Create and start the container
+docker run -d --name mongodb -p 27017:27017 mongo:latest
 
-Step 1: Open Docker Desktop
+Step 3: Check whether the container is running
+docker ps
 
-On Windows:
-1. Install Docker Desktop if it isn't already installed.
-2. Start Docker Desktop.
-3. Wait until Docker reports that the Docker Engine is running.
-4. Open PowerShell or the VS Code terminal.
-Official resources: Docker Desktop for Windows
+Step 4: Open MongoDB Shell (mongosh) inside the container
+docker exec -it mongodb mongosh
+
+Run the remaining MongoDB commands inside mongosh.
 
 Step 2: Verify Docker installation
 
