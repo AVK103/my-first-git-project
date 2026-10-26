@@ -1271,3 +1271,31 @@ Then update each student individually using their primary key:
 UPDATE student
 SET grade = 'O'
 WHERE roll_no = 2;
+
+
+9. Cassandra aggregate functions and indexes (3 minutes)
+A. Count rows
+SELECT COUNT(*) FROM students;
+
+B. Find minimum marks
+SELECT MIN(marks) FROM students;
+
+C. Find maximum marks
+SELECT MAX(marks) FROM students;
+
+D. Calculate average marks
+SELECT AVG(marks) FROM students;
+
+E. Calculate total marks
+SELECT SUM(marks) FROM students;
+
+These aggregate queries have limitations and may depend on the Cassandra version and query context.
+F. Create a secondary index
+CREATE INDEX ON students (course);
+
+G. Query the indexed column
+SELECT * FROM students
+WHERE course = 'MCA';
+
+H. Drop the index
+DROP INDEX students_course_idx;
